@@ -68,7 +68,7 @@
                     android:layout_below="@id/hmText1"/>
             </RelativeLayout>
 
-<!-- STARBUCKS BUTTON ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- STARBUCKS BUTTON ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
             <Button
                 android:id="@+id/starbucksButton"
@@ -126,7 +126,7 @@
                     android:layout_below="@id/starbucksText1"/>
             </RelativeLayout>
 
-<!-- Walmart Button ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- Walmart Button ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
             <Button
                 android:id="@+id/walmartButton"
                 android:layout_marginTop="15dp"
@@ -182,7 +182,7 @@
                     android:layout_below="@id/walmartText1"/>
             </RelativeLayout>
 
-<!-- Pizza Hut ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <!-- Pizza Hut ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
             <Button
                 android:id="@+id/pizzahutButton"
                 android:layout_marginTop="15dp"
@@ -238,7 +238,7 @@
                     android:layout_below="@id/pizzahutText1"/>
             </RelativeLayout>
 
-<!-- Bestbuy Button ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <!-- Bestbuy Button ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
             <Button
                 android:id="@+id/bestbuyButton"
                 android:layout_marginTop="15dp"

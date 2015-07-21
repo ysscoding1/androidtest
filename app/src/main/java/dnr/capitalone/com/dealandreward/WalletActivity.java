@@ -1,16 +1,22 @@
 package dnr.capitalone.com.dealandreward;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-
+import android.widget.LinearLayout;
+import android.graphics.Color;
+import java.util.Map;
+import android.util.Log;
 
 public class WalletActivity extends ActionBarActivity {
 
@@ -18,15 +24,60 @@ public class WalletActivity extends ActionBarActivity {
     Button button;
     ScaleDrawable sd;
     ImageButton imgButton;
-
+    LinearLayout mainLinearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coupon_wallet);
+
+        SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                "walletPrefFiles", Context.MODE_PRIVATE);
+        Map <String, ?> prefFilesMap = sharedPref.getAll();
+        String couponName;
+        String couponDescription;
+        String couponImage;
+        /*mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
+
+        Button buttonToAdd = new Button(this);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
+        params.gravity=Gravity.CENTER;
+        buttonToAdd.setLayoutParams(params);
+        buttonToAdd.setBackgroundResource(R.drawable.red_coupon_top);
+        buttonToAdd.setText("Hello");
+        buttonToAdd.setGravity(Gravity.RIGHT);
+        buttonToAdd.setTextSize(20);
+        buttonToAdd.setAllCaps(false);
+        buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
+
+        mainLinearLayout.addView(buttonToAdd, 0);*/
+
+        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
+        Button buttonToAdd = new Button(this);
+        if (prefFilesMap.isEmpty() != true) {
+            Log.d("MyApp", "Inside!");
+            couponName = sharedPref.getString("couponID_Name", "0");
+            couponDescription = sharedPref.getString("couponID_Description", "0");
+            couponImage = sharedPref.getString("couponID_Image", "0");
+            //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
+            Log.d("MyApp", "Inside!");
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
+            params.gravity=Gravity.CENTER;
+            buttonToAdd.setLayoutParams(params);
+            buttonToAdd.setBackgroundResource(R.drawable.red_coupon_top);
+            buttonToAdd.setText(couponDescription);
+            buttonToAdd.setGravity(Gravity.RIGHT);
+            buttonToAdd.setTextSize(20);
+            buttonToAdd.setAllCaps(false);
+            buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
+
+            mainLinearLayout.addView(buttonToAdd, 0);
+        }
+
         //setContentView(R.layout.activity_wallet);
 
         /* Body */
-        drawable = getResources().getDrawable(R.drawable.hm_icon);
+        /*drawable = getResources().getDrawable(R.drawable.hm_icon);
         drawable.setBounds(0, 0, (int) (drawable.getIntrinsicWidth() * 0.25),
                 (int) (drawable.getIntrinsicHeight() * 0.25));
         sd = new ScaleDrawable(drawable, 0, 70, 70);
@@ -60,7 +111,7 @@ public class WalletActivity extends ActionBarActivity {
         sd = new ScaleDrawable(drawable, 0, 70, 70);
         button = (Button) findViewById(R.id.bestbuyButton);
         button.setCompoundDrawables(sd.getDrawable(), null, null, null); //set drawableLeft for example
-
+        */
 
         /* Footer */
         imgButton =(ImageButton)findViewById(R.id.shareButton);

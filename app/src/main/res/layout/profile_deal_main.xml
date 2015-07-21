@@ -262,17 +262,20 @@
                 android:background="#EEEEEE">
 
                 <TableRow
-                    android:id="@+id/footer">
+                    android:id="@+id/footer"
+                    android:weightSum="2">
                     <LinearLayout
                         android:orientation="vertical"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_gravity="center"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip">
                         <ImageButton
                             android:layout_width="200px"
                             android:layout_height="150px"
+                            android:layout_gravity="center"
                             android:background="@drawable/shareicon"
                             android:id="@+id/shareButton"/>
                         <TextView
@@ -280,10 +283,11 @@
                             android:layout_width="200px"
                             android:layout_height="100px"
                             android:text="@string/share"
+                            android:layout_gravity="center"
                             android:gravity="center"/>
                         <!--android:src="@drawable/share"/>-->
                     </LinearLayout>
-                    <LinearLayout
+                    <!--<LinearLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -303,12 +307,13 @@
                             android:layout_height="100px"
                             android:text="@string/money"
                             android:gravity="center"/>
-                    </LinearLayout>
+                    </LinearLayout>-->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
+                        android:layout_weight="1"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip" >
                         <ImageButton
@@ -317,12 +322,14 @@
                             android:adjustViewBounds="true"
                             android:scaleType="fitXY"
                             android:background="@drawable/walleticon"
+                            android:layout_gravity="center"
                             android:id="@+id/walletButton"/>
                         <TextView
                             android:id="@+id/walletText"
                             android:layout_width="200px"
                             android:layout_height="100px"
                             android:text="@string/wallet"
+                            android:layout_gravity="center"
                             android:gravity="center"/>
                     </LinearLayout>
                     <!--<LinearLayout

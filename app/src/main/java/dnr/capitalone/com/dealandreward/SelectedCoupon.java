@@ -1,7 +1,9 @@
 package dnr.capitalone.com.dealandreward;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
@@ -11,12 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
 
 public class SelectedCoupon extends ActionBarActivity {
-
+    ImageView imageView;
+    ImageButton imgButton;
+    LinearLayout mainLinearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +35,24 @@ public class SelectedCoupon extends ActionBarActivity {
             imgView.setImageResource(getResources().getIdentifier(value,"drawable", getPackageName()));
         }
 
-        ImageButton imgButton =(ImageButton) findViewById(R.id.walletButton);
+        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevel);
+
+        imgButton = (ImageButton) findViewById(R.id.clipCouponButton);
+        imgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                        "walletPrefFiles", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("couponID_Name", "T.G.I.F.");   // NEED INPUT FROM DB
+                editor.putString("couponID_Description", "$20 off Purchase of $10"); // NEED INPUT FROM DB
+                editor.putString("couponID_Image", "tgifcoupon");
+                editor.commit();
+            }
+        });
+
+
+        imgButton =(ImageButton) findViewById(R.id.walletButton);
         imgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

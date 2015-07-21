@@ -1,5 +1,6 @@
 package dnr.capitalone.com.dealandreward;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.transition.TransitionManager;
 import android.view.animation.Animation;
+import android.content.SharedPreferences;
 
 
 public class dealMainActivity extends ActionBarActivity {
@@ -36,6 +38,13 @@ public class dealMainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         //Facebook.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_deal_main);
+
+        /* TODO: CHANGE~~   Clear When Coupon is Used or Deleted */
+        SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                "walletPrefFiles", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
 
         /* Header */
         textview = (TextView) findViewById(R.id.headerText);
@@ -97,7 +106,13 @@ public class dealMainActivity extends ActionBarActivity {
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
         button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
-
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(dealMainActivity.this, MoneyEarnedActivity.class);
+                startActivity(i);
+            }
+        });
 
         /* Footer */
         imgButton =(ImageButton)findViewById(R.id.shareButton);
@@ -116,14 +131,14 @@ public class dealMainActivity extends ActionBarActivity {
             }
         });
 
-        imgButton = (ImageButton)findViewById(R.id.moneyButton);
+        /*imgButton = (ImageButton)findViewById(R.id.moneyButton);
         imgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(dealMainActivity.this, MoneyEarnedActivity.class);
                 startActivity(i);
             }
-        });
+        });*/
 
         imgButton = (ImageButton)findViewById(R.id.walletButton);
         imgButton.setOnClickListener(new View.OnClickListener() {

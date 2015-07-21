@@ -12,6 +12,7 @@
         <string name="title_activity_selected_coupon">SelectedCoupon</string>
         <string name="title_activity_wallet">WalletActivity</string>
         <string name="title_activity_money_earned">MoneyEarnedActivity</string>
+        <string name="title_activity_rewards_info">RewardsInfoActivity</string>
         <string name="restaurants">Restaurants</string>
         <string name="retailers">Retailers</string>
         <string name="services">Services</string>

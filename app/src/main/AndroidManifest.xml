@@ -25,7 +25,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBMeiYpsvJ3qpEu1enF2vUJkd8Tehi3Hb0" <!--//"AIzaSyC728ScXJMM5A_T46zx84GZ1h9BJeFUGKs" />-->
+            android:value="AIzaSyBMeiYpsvJ3qpEu1enF2vUJkd8Tehi3Hb0" /> <!--//"AIzaSyC728ScXJMM5A_T46zx84GZ1h9BJeFUGKs" />-->
 
         <activity
             android:name=".dealMainActivity"
@@ -78,6 +78,11 @@
         <activity
             android:name=".MoneyEarnedActivity"
             android:label="@string/title_activity_money_earned" >
+        </activity>
+
+        <activity
+            android:name=".RewardsInfoActivity"
+            android:label="@string/title_activity_rewards_info" >
         </activity>
     </application>
 

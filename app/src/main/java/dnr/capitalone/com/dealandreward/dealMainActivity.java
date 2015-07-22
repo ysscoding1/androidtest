@@ -1,10 +1,13 @@
 package dnr.capitalone.com.dealandreward;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -22,6 +25,8 @@ import android.widget.Toast;
 import android.transition.TransitionManager;
 import android.view.animation.Animation;
 import android.content.SharedPreferences;
+
+import java.util.ArrayList;
 
 
 public class dealMainActivity extends ActionBarActivity {
@@ -123,11 +128,18 @@ public class dealMainActivity extends ActionBarActivity {
 
               /*  Toast.makeText(getApplicationContext(), "You download is resumed", Toast.LENGTH_LONG).show();*/
 
-                Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
-                i.putExtra(Intent.EXTRA_TEXT, "http://www.url.com");
-                startActivity(Intent.createChooser(i, "Share URL"));
+                ArrayList<Uri> imageUris = new ArrayList<Uri>();
+                // imageUris.add(R.drawable.c1);
+
+                Resources resources = getResources();
+                Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1));
+                imageUris.add(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1)));
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, imageUris);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId=bkadali@gmail.com");
+                startActivity(Intent.createChooser(intent,"compatible apps:"));
             }
         });
 

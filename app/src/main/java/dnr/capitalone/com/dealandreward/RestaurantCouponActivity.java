@@ -131,7 +131,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         Thread background = new Thread(new Runnable() {
 
 
-            private String urlString = "http://192.168.2.41:8080/retreive/coupon/restuarent/"+getZipCode();
+            private String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+getZipCode();
 
             // After call for background.start this run method call
             public void run() {
@@ -355,7 +355,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUris);
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://capitalone.com/Apps/DealsnRewards/U1CX7D");
+                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId=bkadali@gmail.com");
                 startActivity(Intent.createChooser(intent,"compatible apps:"));
             }
         });

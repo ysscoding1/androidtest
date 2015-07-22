@@ -29,7 +29,7 @@ public class SelectedCoupon extends ActionBarActivity {
 
 
         Bundle extras = getIntent().getExtras();
-        String urlString = "http://192.168.2.41:8080/retreive/image/grocery/";
+        String urlString = "http://52.5.81.122:8080/retreive/image/grocery/";
         if (extras!=null)
         {
             String value = extras.getString("couponSelected");

@@ -139,9 +139,9 @@ public class LocationFragment extends Fragment {
 
 
         // Create Inner Thread Class
-        Thread background = new Thread(new UIMapProcess(inflater,zipCode, savedInstanceState, container));
+        //Thread background = new Thread(new UIMapProcess(inflater,zipCode, savedInstanceState, container));
         // Start Thread
-        background.start();  //After call start method thread called run Method
+        //background.start();  //After call start method thread called run Method
 
 
        /* Uri gmmIntentUri = Uri.parse("geo:0,0?q=restaurants");
@@ -154,7 +154,7 @@ public class LocationFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_location, container,
                 false);
 
-       /* mMapView = (MapView) v.findViewById(R.id.mapView);
+        mMapView = (MapView) v.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume();// needed to get the map to display immediately
@@ -176,15 +176,57 @@ public class LocationFragment extends Fragment {
         marker.icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
 
-        // adding marker
-        googleMap.addMarker(marker);
-        googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
+        String SetServerString = "";
+        try {
+            String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+zipCode;
+            InputStream in = null;
+            java.net.URL url = new URL(urlString);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+
+            in = new BufferedInputStream(urlConnection.getInputStream());
+            // convert inputstream to string
+            if(in != null)
+                SetServerString = convertInputStreamToString(in);
+            else
+                SetServerString = "Did not work!";
+
+        } catch (Throwable t) {
+            // just end the background thread
+            Log.i("Animation", "Thread  exception " + t);
+        }
+
+
+        if ((null != SetServerString)) {
+
+                        /*Toast.makeText(
+                                getBaseContext(),
+                                "Server Response: "+aResponse,
+                                Toast.LENGTH_SHORT).show();
+                        Log.i("msg:", aResponse);*/
+
+            // Button button =(Button) findViewById(R.id.tgif);
+            Type listType = new TypeToken<List<CouponDetails>>() {
+            }.getType();
+            ArrayList<CouponDetails> list = new Gson().fromJson(SetServerString, listType);
+
+            // adding marker
+            googleMap.addMarker(marker);
+
+            for (int i = 0; i < list.size(); i++) {
+                Double lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
+                Double log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(lat,log)).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant()+ " \n "+ list.get(i).getAddress()));
+            }
+        }
+
+       // googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(latitude, longitude)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
-*/
+
         // Perform any camera updates here
         return v;
 
@@ -253,7 +295,7 @@ public class LocationFragment extends Fragment {
     }
 
 
-    public class UIMapProcess implements Runnable
+    /*public class UIMapProcess implements Runnable
     {
         private LayoutInflater inflater;
         private String zipCode;
@@ -311,11 +353,11 @@ public class LocationFragment extends Fragment {
 
                 if ((null != aResponse)) {
 
-                        /*Toast.makeText(
+                        *//*Toast.makeText(
                                 getBaseContext(),
                                 "Server Response: "+aResponse,
                                 Toast.LENGTH_SHORT).show();
-                        Log.i("msg:", aResponse);*/
+                        Log.i("msg:", aResponse);*//*
 
                     // Button button =(Button) findViewById(R.id.tgif);
                     Type listType = new TypeToken<List<CouponDetails>>() {
@@ -339,14 +381,14 @@ public class LocationFragment extends Fragment {
                             e.printStackTrace();
                         }
 
-                            /*// create marker
+                            // create marker
                             MarkerOptions marker = new MarkerOptions().position(
                                     new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).title(zipCode + " Location");
 
                             // Changing marker icon
                             marker.icon(BitmapDescriptorFactory
                                     .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-*/
+*//*
                         // adding marker
                         //                          googleMap.addMarker(marker);
 
@@ -363,6 +405,6 @@ public class LocationFragment extends Fragment {
                 }
             }
         };
-    }
+    }*/
 }
 

@@ -9,12 +9,21 @@ import android.content.Intent;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -38,6 +47,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,8 +61,20 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 public class RestaurantCouponActivity extends FragmentActivity implements LocationFragment.OnFragmentInteractionListener {
@@ -64,6 +86,9 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
 
     String zCode;
     public static FragmentManager fragmentManager;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    private GoogleApiClient mGoogleApiClient;
 
     public String getZipCode() {
         if (getIntent().getExtras() != null) {
@@ -100,9 +125,159 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         LocationFragment lf = new LocationFragment();
         ft.replace(R.id.mapView, lf);
         ft.commit();
+
+
+        // Create Inner Thread Class
+        Thread background = new Thread(new Runnable() {
+
+
+            private String urlString = "http://192.168.2.41:8080/retreive/coupon/restuarent/"+getZipCode();
+
+            // After call for background.start this run method call
+            public void run() {
+                try {
+
+                    InputStream in = null;
+                    java.net.URL url = new URL(urlString);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                    String SetServerString = "";
+                    in = new BufferedInputStream(urlConnection.getInputStream());
+                    // convert inputstream to string
+                    if(in != null)
+                        SetServerString = convertInputStreamToString(in);
+                    else
+                        SetServerString = "Did not work!";
+                    threadMsg(SetServerString);
+
+                } catch (Throwable t) {
+                    // just end the background thread
+                    Log.i("Animation", "Thread  exception " + t);
+                }
+            }
+
+            private void threadMsg(String msg) {
+
+                if (!msg.equals(null) && !msg.equals("")) {
+                    Message msgObj = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("message", msg);
+                    msgObj.setData(b);
+                    handler.sendMessage(msgObj);
+                }
+            }
+
+            // Define the Handler that receives messages from the thread and update the progress
+            private final Handler handler = new Handler() {
+
+                public void handleMessage(Message msg) {
+
+                    String aResponse = msg.getData().getString("message");
+
+                    if ((null != aResponse)) {
+
+                        /*Toast.makeText(
+                                getBaseContext(),
+                                "Server Response: "+aResponse,
+                                Toast.LENGTH_SHORT).show();
+                        Log.i("msg:", aResponse);*/
+
+                        // Button button =(Button) findViewById(R.id.tgif);
+                        Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
+                        ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
+
+
+                        // button.setText(list.get(0).getMerchant() + "\t\t" + list.get(0).getCouponInfo());
+
+                        LinearLayout ll = (LinearLayout)findViewById(R.id.mapLevel);
+                        //LinearLayout[] lLayout = new LinearLayout[list.size()];
+                        for (int i = 0; i < list.size(); i++) {
+
+                          //  lLayout[i] = new LinearLayout(getApplicationContext());
+
+
+                            Toast.makeText(
+                                    getBaseContext(),
+                                    "Server Response: "+list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
+                                    Toast.LENGTH_SHORT).show();
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                            //ll.setLayoutParams(params);
+                            // ll.setPadding(0,100,0,100);
+
+                            Button btn = new Button(getApplicationContext());
+                            btn.setId(i);
+                            btn.setCompoundDrawablesWithIntrinsicBounds( R.drawable.restauranticon25, 0, 0, 0);
+                            final int id_ = btn.getId();
+                            btn.setText(list.get(i).getMerchant() +"\t\t\t\t\t"+ list.get(i).getCouponInfo());
+                            //btn.setBackgroundColor(Color.rgb(70, 80, 90));
+                            //btn.setText("Hello World");
+                            if (i%2==0) {
+                                btn.setBackgroundColor(Color.LTGRAY);
+                            }
+                            else
+                            {
+                                btn.setBackgroundColor(Color.DKGRAY);
+                            }
+                            ll.addView(btn, params);
+                            //idName = list.get(i).getCouponId();
+                            Button btn1 = ((Button) findViewById(id_));
+                            btn1.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
+                        }
+
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                       // for (LinearLayout ll1 : lLayout)
+                       // {
+                       //     ll.addView(ll1, params);
+                       // }
+                    }
+                    else
+                    {
+
+                        // ALERT MESSAGE
+                        Toast.makeText(
+                                getBaseContext(),
+                                "Not Got Response From Server.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            };
+
+        });
+        // Start Thread
+        background.start();  //After call start method thread called run Method
+
+
+
         Context context = this;
         SharedPreferences sharedPref = context.getSharedPreferences(
                 "dealnrewardPrefFiles", Context.MODE_PRIVATE);
+
+
+       /* mGoogleApiClient =   mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation  != null) {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+            List<Address> addresses;
+            try {
+                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                setZipCode(addresses.get(0).getPostalCode());
+                Toast.makeText(this, "new ZipCode:"+addresses.get(0).getPostalCode(), Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }*/
 
         final EditText editText = (EditText) findViewById(R.id.locationInput);
 
@@ -144,22 +319,22 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     //        .fromResource(R.drawable.ic_launcher)));
         }*/
 
-        buttonView = findViewById(R.id.tgifButton);
+  /*      buttonView = findViewById(R.id.tgifButton);
         buttonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* Map */
+                *//* Map *//*
                 SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
                         "dealnrewardPrefFiles", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("reward1", "test1");
 
                 Intent i = new Intent(RestaurantCouponActivity.this, SelectedCoupon.class);
-                /* Map */
+                *//* Map *//*
                 i.putExtra("couponSelected", "tgifcoupon");
                 startActivity(i);
             }
-        });
+        });*/
 
 
 
@@ -356,4 +531,41 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
             Toast.makeText(this, dataValue.toString(), Toast.LENGTH_LONG);
         }
     }
+
+
+    public class SelectedCouponListiner implements View.OnClickListener
+    {
+
+        String selectedCoupon;
+        public SelectedCouponListiner(String selectedCoupon) {
+            this.selectedCoupon = selectedCoupon;
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                    "dealnrewardPrefFiles", Context.MODE_PRIVATE);
+            Intent i = new Intent(RestaurantCouponActivity.this, SelectedCoupon.class);
+            i.putExtra("couponSelected", selectedCoupon);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("reward1", "test1");
+            startActivity(i);
+        }
+
+    };
+
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
+    }
+
 }

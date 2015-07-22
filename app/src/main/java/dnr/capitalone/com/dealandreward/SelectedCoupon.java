@@ -27,15 +27,21 @@ public class SelectedCoupon extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_coupons);
 
+
         Bundle extras = getIntent().getExtras();
+        String urlString = "http://192.168.2.41:8080/retreive/image/grocery/";
         if (extras!=null)
         {
             String value = extras.getString("couponSelected");
+            urlString+=value;
             ImageView imgView = (ImageView) findViewById(R.id.couponstodisplay);
-            imgView.setImageResource(getResources().getIdentifier(value,"drawable", getPackageName()));
-        }
+            new DownloadImageTask(imgView)
+                    .execute(urlString);
 
-        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevel);
+
+            // imgView.setImageResource(getResources().getIdentifier(value,"drawable", getPackageName()));
+        }
+      /*  mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevel);
 
         imgButton = (ImageButton) findViewById(R.id.clipCouponButton);
         imgButton.setOnClickListener(new View.OnClickListener() {
@@ -50,7 +56,7 @@ public class SelectedCoupon extends ActionBarActivity {
                 editor.commit();
             }
         });
-
+*/
 
         imgButton =(ImageButton) findViewById(R.id.walletButton);
         imgButton.setOnClickListener(new View.OnClickListener() {

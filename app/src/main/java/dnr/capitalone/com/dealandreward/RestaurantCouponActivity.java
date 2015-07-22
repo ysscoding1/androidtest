@@ -44,6 +44,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -147,7 +148,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     if(in != null)
                         SetServerString = convertInputStreamToString(in);
                     else
-                        SetServerString = "Did not work!";
+                        SetServerString = "Did not work!";//Toast.makeText(getApplicationContext(),"ServerString: "+ SetServerString,Toast.LENGTH_SHORT);
                     threadMsg(SetServerString);
 
                 } catch (Throwable t) {
@@ -223,7 +224,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             ll.addView(btn, params);
                             //idName = list.get(i).getCouponId();
                             Button btn1 = ((Button) findViewById(id_));
-                            btn1.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
+                            btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                         }
 
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -289,7 +290,10 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("zipcode", editText.getText().toString());*/
                 if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    //Toast.makeText(getBaseContext(), "DOne focus", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(getBaseContext(), "DOne focus", Toast.LENGTH_SHORT).show();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                     /*Bundle bundle = new Bundle();
                     bundle.putString("zipCode", "60616");
                     //set Fragmentclass Arguments
@@ -302,6 +306,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     startActivity(i);
                     return true;
                 }
+                Toast.makeText(getBaseContext(), "didn't get focus", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -533,11 +538,11 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
     }
 
 
-    public class SelectedCouponListiner implements View.OnClickListener
+    public class SelectedCouponListener implements View.OnClickListener
     {
 
         String selectedCoupon;
-        public SelectedCouponListiner(String selectedCoupon) {
+        public SelectedCouponListener(String selectedCoupon) {
             this.selectedCoupon = selectedCoupon;
         }
 

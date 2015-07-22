@@ -2,13 +2,19 @@ package dnr.capitalone.com.dealandreward;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,8 +25,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -121,6 +137,13 @@ public class LocationFragment extends Fragment {
         //}
 
 
+
+        // Create Inner Thread Class
+        Thread background = new Thread(new UIMapProcess(inflater,zipCode, savedInstanceState, container));
+        // Start Thread
+        background.start();  //After call start method thread called run Method
+
+
        /* Uri gmmIntentUri = Uri.parse("geo:0,0?q=restaurants");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setPackage("com.google.android.apps.maps");
@@ -130,7 +153,8 @@ public class LocationFragment extends Fragment {
         // inflat and return the layout
         View v = inflater.inflate(R.layout.fragment_location, container,
                 false);
-        mMapView = (MapView) v.findViewById(R.id.mapView);
+
+       /* mMapView = (MapView) v.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume();// needed to get the map to display immediately
@@ -160,7 +184,7 @@ public class LocationFragment extends Fragment {
                 .target(new LatLng(latitude, longitude)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
-
+*/
         // Perform any camera updates here
         return v;
 
@@ -215,5 +239,130 @@ public class LocationFragment extends Fragment {
 
         }
     }*/
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
+    }
+
+
+    public class UIMapProcess implements Runnable
+    {
+        private LayoutInflater inflater;
+        private String zipCode;
+        private Bundle savedInstanceState;
+        private ViewGroup container;
+        public UIMapProcess(LayoutInflater _inflater, String _zipCode, Bundle _savedInstance, ViewGroup _container) {
+            this.inflater = _inflater;
+            this.zipCode = _zipCode;
+            savedInstanceState = _savedInstance;
+            container = _container;
+        }
+
+        private String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+zipCode;
+
+        // After call for background.start this run method call
+        public void run() {
+            try {
+
+                InputStream in = null;
+                java.net.URL url = new URL(urlString);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                String SetServerString = "";
+                in = new BufferedInputStream(urlConnection.getInputStream());
+                // convert inputstream to string
+                if(in != null)
+                    SetServerString = convertInputStreamToString(in);
+                else
+                    SetServerString = "Did not work!";
+                threadMsg(SetServerString);
+
+            } catch (Throwable t) {
+                // just end the background thread
+                Log.i("Animation", "Thread  exception " + t);
+            }
+        }
+
+        private void threadMsg(String msg) {
+
+            if (!msg.equals(null) && !msg.equals("")) {
+                Message msgObj = handler.obtainMessage();
+                Bundle b = new Bundle();
+                b.putString("message", msg);
+                msgObj.setData(b);
+                handler.sendMessage(msgObj);
+            }
+        }
+
+        // Define the Handler that receives messages from the thread and update the progress
+        private final Handler handler = new Handler() {
+
+            public void handleMessage(Message msg) {
+
+                String aResponse = msg.getData().getString("message");
+
+                if ((null != aResponse)) {
+
+                        /*Toast.makeText(
+                                getBaseContext(),
+                                "Server Response: "+aResponse,
+                                Toast.LENGTH_SHORT).show();
+                        Log.i("msg:", aResponse);*/
+
+                    // Button button =(Button) findViewById(R.id.tgif);
+                    Type listType = new TypeToken<List<CouponDetails>>() {
+                    }.getType();
+                    ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
+
+                    //LinearLayout[] lLayout = new LinearLayout[list.size()];
+                    googleMap = mMapView.getMap();
+                    View v = inflater.inflate(R.layout.fragment_location, container,
+                            false);
+                    for (int i = 0; i < list.size(); i++) {
+
+                        mMapView = (MapView) v.findViewById(R.id.mapView);
+                        mMapView.onCreate(savedInstanceState);
+
+                        mMapView.onResume();// needed to get the map to display immediately
+
+                        try {
+                            MapsInitializer.initialize(getActivity().getApplicationContext());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                            /*// create marker
+                            MarkerOptions marker = new MarkerOptions().position(
+                                    new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).title(zipCode + " Location");
+
+                            // Changing marker icon
+                            marker.icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+*/
+                        // adding marker
+                        //                          googleMap.addMarker(marker);
+
+                        Double lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
+                        Double log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
+                        googleMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant()+ " \n "+ list.get(i).getAddress()));
+
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).zoom(12).build();
+                        googleMap.animateCamera(CameraUpdateFactory
+                                .newCameraPosition(cameraPosition));
+
+                    }
+                }
+            }
+        };
+    }
 }
 

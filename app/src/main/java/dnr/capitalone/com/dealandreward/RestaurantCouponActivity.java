@@ -2,6 +2,7 @@ package dnr.capitalone.com.dealandreward;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -213,8 +214,11 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             btn.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                             ll.addView(btn, params);*/
                             //idName = list.get(i).getCouponId();
+
                             /* BHANU? Button btn1 = ((Button) findViewById(id_));
                             btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));*/
+                           // Button btn1 = ((Button) findViewById(id_));
+                           // btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                         }
 
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -271,6 +275,9 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         }*/
 
         final EditText editText = (EditText) findViewById(R.id.locationInput);
+
+        InputMethodManager imm = (InputMethodManager)this.getSystemService(Service.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromInputMethod(editText.getWindowToken(),0);
 
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -347,10 +354,15 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1));
                 imageUris.add(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1)));
 
+                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                        "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                String userName = sharedPref.getString("username", "bkadali@gmail.com");
+
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUris);
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId=bkadali@gmail.com");
+                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId="+userName);
                 startActivity(Intent.createChooser(intent,"compatible apps:"));
             }
         });

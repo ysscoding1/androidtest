@@ -6,16 +6,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class SelectedCoupon extends ActionBarActivity {
@@ -26,13 +30,13 @@ public class SelectedCoupon extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_coupons);
-
+        String value = null;
 
         Bundle extras = getIntent().getExtras();
         String urlString = "http://52.5.81.122:8080/retreive/image/grocery/";
         if (extras!=null)
         {
-            String value = extras.getString("couponSelected");
+            value = extras.getString("couponSelected");
             urlString+=value;
             ImageView imgView = (ImageView) findViewById(R.id.couponstodisplay);
             new DownloadImageTask(imgView)
@@ -41,22 +45,11 @@ public class SelectedCoupon extends ActionBarActivity {
 
             // imgView.setImageResource(getResources().getIdentifier(value,"drawable", getPackageName()));
         }
-      /*  mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevel);
+        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevel);
 
         imgButton = (ImageButton) findViewById(R.id.clipCouponButton);
-        imgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
-                        "walletPrefFiles", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("couponID_Name", "T.G.I.F.");   // NEED INPUT FROM DB
-                editor.putString("couponID_Description", "$20 off Purchase of $10"); // NEED INPUT FROM DB
-                editor.putString("couponID_Image", "tgifcoupon");
-                editor.commit();
-            }
-        });
-*/
+        imgButton.setOnClickListener(new SCListener(value));
+
 
         imgButton =(ImageButton) findViewById(R.id.walletButton);
         imgButton.setOnClickListener(new View.OnClickListener() {
@@ -126,5 +119,46 @@ public class SelectedCoupon extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class SCListener implements View.OnClickListener
+    {
+
+        String selectedCoupon;
+        public SCListener(String selectedCoupon) {
+            this.selectedCoupon = selectedCoupon;
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            //  Toast.makeText(getApplicationContext(), "Getting:" , Toast.LENGTH_SHORT);
+            SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                    "walletPrefFiles", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            Map<String, ?> prefFilesMap = sharedPref.getAll();
+            if (prefFilesMap.isEmpty() == true) {
+                editor.putString("couponIDs", selectedCoupon);
+            }
+            else {
+                String existingIds = (String) prefFilesMap.get("couponIDs");
+                editor.putString("couponIDs", existingIds + "," + selectedCoupon);
+                Log.d("MyApp", "Existing IDs: " + existingIds);
+            }
+            /*String existingIds = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("walletPrefFiles", "");
+
+            if (existingIds.isEmpty()) {
+                editor.putString("couponIDs", selectedCoupon);
+            }
+            else {
+
+                editor.putString("couponIDs", existingIds + "," + selectedCoupon);
+            }*/
+            editor.commit();
+
+            //String allIds = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("walletPrefFiles", "");
+            //Toast.makeText(getApplicationContext(), "All Ids: "+ allIds , Toast.LENGTH_SHORT);
+        }
+
     }
 }

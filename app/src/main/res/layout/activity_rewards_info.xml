@@ -83,8 +83,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:textSize="35sp"
-                    android:textColor="#FFFFFF"
-                    android:text="1,069"/>
+                    android:textColor="#FFFFFF"/>
                 <TextView
                     android:id="@+id/earnedDollarSign"
                     android:layout_width="wrap_content"
@@ -104,7 +103,6 @@
                     android:paddingTop="4sp"
                     android:layout_toRightOf="@id/earnedDollarAmount"
                     android:layout_alignTop="@id/earnedDollarAmount"
-                    android:text="92"
                     android:textSize="20sp"
                     android:textColor="#FFFFFF"/>
             </RelativeLayout>
@@ -158,6 +156,7 @@
                         android:text="Own Purchases"
                         android:layout_weight="1"/>
                     <TextView
+                        android:id="@+id/firstLevelRewardsAmount"
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -168,8 +167,7 @@
                         android:layout_gravity="center"
                         android:gravity="right"
                         android:textSize="13sp"
-                        android:textColor="#000000"
-                        android:text="$500"/>
+                        android:textColor="#000000"/>
                 </LinearLayout>
                 <LinearLayout
                     android:orientation="horizontal"
@@ -193,6 +191,7 @@
                         android:text="Friends' Purchases"
                         android:layout_weight="1"/>
                     <TextView
+                        android:id="@+id/secondLevelRewardsAmount"
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -203,8 +202,7 @@
                         android:layout_gravity="center"
                         android:gravity="right"
                         android:textSize="13sp"
-                        android:textColor="#000000"
-                        android:text="$500"/>
+                        android:textColor="#000000"/>
                 </LinearLayout>
                 <LinearLayout
                     android:orientation="horizontal"
@@ -229,6 +227,7 @@
                         android:text="Friends of Friends Purchases"
                         android:layout_weight="1"/>
                     <TextView
+                        android:id="@+id/thirdLevelRewardsAmount"
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -239,8 +238,7 @@
                         android:layout_gravity="center"
                         android:gravity="right"
                         android:textSize="13sp"
-                        android:textColor="#000000"
-                        android:text="$69.92"/>
+                        android:textColor="#000000"/>
                 </LinearLayout>
 
 

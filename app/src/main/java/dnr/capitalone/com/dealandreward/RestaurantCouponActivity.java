@@ -1,6 +1,5 @@
 package dnr.capitalone.com.dealandreward;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ContentResolver;
@@ -11,8 +10,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +20,6 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -32,35 +28,17 @@ import com.google.android.gms.maps.model.LatLng;
  * Created by RichardYan on 6/25/15.
  */
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Intent;
-import android.location.Location;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -74,7 +52,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 public class RestaurantCouponActivity extends FragmentActivity implements LocationFragment.OnFragmentInteractionListener {
@@ -147,9 +124,9 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     if(in != null)
                         SetServerString = convertInputStreamToString(in);
                     else
-                        SetServerString = "Did not work!";
+                        SetServerString = "Did not work!";//Toast.makeText(getApplicationContext(),"ServerString: "+ SetServerString,Toast.LENGTH_SHORT);
                     threadMsg(SetServerString);
-
+                    Log.d("SetServerString", "String is: " + SetServerString);
                 } catch (Throwable t) {
                     // just end the background thread
                     Log.i("Animation", "Thread  exception " + t);
@@ -173,7 +150,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 public void handleMessage(Message msg) {
 
                     String aResponse = msg.getData().getString("message");
-
+                    Log.d("Restaurant", "In restaurantcoupon aResponse is: " + aResponse);
                     if ((null != aResponse)) {
 
                         /*Toast.makeText(
@@ -185,34 +162,47 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                         // Button button =(Button) findViewById(R.id.tgif);
                         Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
                         ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
-
+                        Log.d("CouponList", "List is: " + list);
 
                         // button.setText(list.get(0).getMerchant() + "\t\t" + list.get(0).getCouponInfo());
 
                         LinearLayout ll = (LinearLayout)findViewById(R.id.mapLevel);
-                        //LinearLayout[] lLayout = new LinearLayout[list.size()];
                         for (int i = 0; i < list.size(); i++) {
-
-                          //  lLayout[i] = new LinearLayout(getApplicationContext());
-
-
                             Toast.makeText(
                                     getBaseContext(),
                                     "Server Response: "+list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
                                     Toast.LENGTH_SHORT).show();
+
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT);
-                            //ll.setLayoutParams(params);
-                            // ll.setPadding(0,100,0,100);
+                                    89);
+                            if (i == 0)
+                                params.topMargin = 40;
+                            String backgroundColor = "";
+                            if (i%2 == 0) {
+                                backgroundColor = "#FAFAFA";
+                            }
+                            else
+                            {
+                                backgroundColor = "#E6E6E6";
+                            }
 
-                            Button btn = new Button(getApplicationContext());
+                            View repeatedCouponButtonLayout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.coupon_button_frame, null);
+                            repeatedCouponButtonLayout.setBackgroundColor(Color.parseColor(backgroundColor));
+                            ((TextView)repeatedCouponButtonLayout.findViewById(R.id.couponButtonFrameMerchantName)).setText(list.get(i).getMerchant());
+                            ((TextView)repeatedCouponButtonLayout.findViewById(R.id.couponButtonFrameMerchantName)).setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.restauranticon25, 0, 0, 0);
+                            ((TextView)repeatedCouponButtonLayout.findViewById(R.id.couponButtonFrameDescription)).setText(list.get(i).getCouponInfo());
+                            repeatedCouponButtonLayout.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
+                            ll.addView(repeatedCouponButtonLayout, params);
+
+                            /*Button btn = new Button(getApplicationContext());
                             btn.setId(i);
                             btn.setCompoundDrawablesWithIntrinsicBounds( R.drawable.restauranticon25, 0, 0, 0);
                             final int id_ = btn.getId();
                             btn.setText(list.get(i).getMerchant() +"\t\t\t\t\t"+ list.get(i).getCouponInfo());
                             //btn.setBackgroundColor(Color.rgb(70, 80, 90));
                             //btn.setText("Hello World");
+
                             if (i%2==0) {
                                 btn.setBackgroundColor(Color.LTGRAY);
                             }
@@ -220,20 +210,21 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             {
                                 btn.setBackgroundColor(Color.DKGRAY);
                             }
-                            ll.addView(btn, params);
+                            btn.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
+                            ll.addView(btn, params);*/
                             //idName = list.get(i).getCouponId();
-                            Button btn1 = ((Button) findViewById(id_));
-                            btn1.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
+                            /* BHANU? Button btn1 = ((Button) findViewById(id_));
+                            btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));*/
                         }
 
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                       // for (LinearLayout ll1 : lLayout)
-                       // {
-                       //     ll.addView(ll1, params);
-                       // }
+                        // for (LinearLayout ll1 : lLayout)
+                        // {
+                        //     ll.addView(ll1, params);
+                        // }
                     }
                     else
                     {
@@ -289,7 +280,10 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("zipcode", editText.getText().toString());*/
                 if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    //Toast.makeText(getBaseContext(), "DOne focus", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(getBaseContext(), "DOne focus", Toast.LENGTH_SHORT).show();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                     /*Bundle bundle = new Bundle();
                     bundle.putString("zipCode", "60616");
                     //set Fragmentclass Arguments
@@ -302,6 +296,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     startActivity(i);
                     return true;
                 }
+                Toast.makeText(getBaseContext(), "didn't get focus", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -533,11 +528,11 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
     }
 
 
-    public class SelectedCouponListiner implements View.OnClickListener
+    public class SelectedCouponListener implements View.OnClickListener
     {
 
         String selectedCoupon;
-        public SelectedCouponListiner(String selectedCoupon) {
+        public SelectedCouponListener(String selectedCoupon) {
             this.selectedCoupon = selectedCoupon;
         }
 

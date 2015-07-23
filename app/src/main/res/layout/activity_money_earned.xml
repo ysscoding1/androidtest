@@ -83,8 +83,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:textSize="35sp"
-                    android:textColor="#FFFFFF"
-                    android:text="1,069"/>
+                    android:textColor="#FFFFFF"/>
                 <TextView
                     android:id="@+id/earnedDollarSign"
                     android:layout_width="wrap_content"
@@ -104,7 +103,6 @@
                     android:paddingTop="4sp"
                     android:layout_toRightOf="@id/earnedDollarAmount"
                     android:layout_alignTop="@id/earnedDollarAmount"
-                    android:text="92"
                     android:textSize="20sp"
                     android:textColor="#FFFFFF"/>
             </RelativeLayout>

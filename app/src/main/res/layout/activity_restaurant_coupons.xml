@@ -60,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="textAutoComplete"
-                    android:imeOptions="actionDone"
+
                     android:id="@+id/locationInput" />
             </LinearLayout>
 
@@ -71,11 +71,11 @@
                 android:layout_gravity="center_horizontal"
                 android:paddingTop="5dp">
 
-            <!--   <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                      android:name="com.google.android.gms.maps.SupportMapFragment"
                      android:id="@+id/map"
                      android:layout_width="match_parent"
-                     android:layout_height="50pt"/>-->
+                     android:layout_height="50pt"/> -->
                 <com.google.android.gms.maps.MapView
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/mapView"

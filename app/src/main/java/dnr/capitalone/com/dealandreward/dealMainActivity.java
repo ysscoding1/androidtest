@@ -45,11 +45,11 @@ public class dealMainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_deal_main);
 
         /* TODO: CHANGE~~   Clear When Coupon is Used or Deleted */
-        SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+        /*SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
                 "walletPrefFiles", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.clear();
-        editor.commit();
+        editor.commit();*/
 
         /* Header */
         textview = (TextView) findViewById(R.id.headerText);

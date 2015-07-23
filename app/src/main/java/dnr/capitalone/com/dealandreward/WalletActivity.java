@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.net.Uri;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -19,65 +20,147 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.graphics.Color;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import android.os.Handler;
+
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class WalletActivity extends ActionBarActivity {
 
     Drawable drawable;
-    Button button;
+    Button button, buttonToAdd;
     ScaleDrawable sd;
     ImageButton imgButton;
     LinearLayout mainLinearLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coupon_wallet);
 
-        SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
-                "walletPrefFiles", Context.MODE_PRIVATE);
-        Map <String, ?> prefFilesMap = sharedPref.getAll();
-        String couponName;
-        String couponDescription;
-        String couponImage;
-        /*mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
+        // Create Inner Thread Class
+        Thread background = new Thread(new Runnable() {
 
-        Button buttonToAdd = new Button(this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
-        params.gravity=Gravity.CENTER;
-        buttonToAdd.setLayoutParams(params);
-        buttonToAdd.setBackgroundResource(R.drawable.red_coupon_top);
-        buttonToAdd.setText("Hello");
-        buttonToAdd.setGravity(Gravity.RIGHT);
-        buttonToAdd.setTextSize(20);
-        buttonToAdd.setAllCaps(false);
-        buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
+            private String urlString = "http://52.5.81.122:8080/retreive/coupon/";
+            private String jsonString = "";
+            private String SetServerString = "";
+            // After call for background.start this run method call
+            public void run() {
+                try {
+                    SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                    "walletPrefFiles", Context.MODE_PRIVATE);
+                    Map <String, ?> prefFilesMap = sharedPref.getAll();
+                    String couponIDs;
+                    mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
+                    buttonToAdd = new Button(getBaseContext());
 
-        mainLinearLayout.addView(buttonToAdd, 0);*/
+                    if (prefFilesMap.isEmpty() != true) {
+                        Log.d("MyApp", "Inside!");
+                        couponIDs = (String) prefFilesMap.get("couponIDs");
+                        Log.d("CouponIDSet", couponIDs);
+                        Set<String> couponIDSet = new HashSet<String>(Arrays.asList(couponIDs.split(",")));
+                        int i = 0;
+                        int end = couponIDSet.size();
+                        InputStream in = null;
+                        List<String> couponDetailsList = new ArrayList<String>();
+                        for(String couponID: couponIDSet) {
+                            urlString = "http://52.5.81.122:8080/retreive/coupon/" + couponID;
+                            java.net.URL url = new URL(urlString);
+                            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
-        Button buttonToAdd = new Button(this);
-        if (prefFilesMap.isEmpty() != true) {
-            Log.d("MyApp", "Inside!");
-            couponName = sharedPref.getString("couponID_Name", "0");
-            couponDescription = sharedPref.getString("couponID_Description", "0");
-            couponImage = sharedPref.getString("couponID_Image", "0");
-            //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
-            Log.d("MyApp", "Inside!");
+                            String SetServerString = "";
+                            in = new BufferedInputStream(urlConnection.getInputStream());
+                            //Log.d("MyApp", "Input Stream is: " + convertInputStreamToString(in));
+                            // convert inputstream to string
+                            if(in != null)
+                                SetServerString = convertInputStreamToString(in);
+                            else
+                                SetServerString = "Did not work!";
+                            Log.d("BeforeReplaced", SetServerString);
+                            couponDetailsList.add(SetServerString);
+                            /*SetServerString = SetServerString.replaceAll("[\\[\\]]", "");
+                            Log.d("Replaced", SetServerString);
+                            if(i == 0 && i == (end-1)){
+                                jsonString += "[" + SetServerString + "]";
+                            }
+                            else if (i == 0) {
+                                jsonString += "[" + SetServerString + ",";
+                            }
+                            else if (i == (end-1)) {
+                                jsonString += SetServerString + "]";
+                            }
+                            else {
+                                jsonString += SetServerString + ",";
+                            }*/
+                        }
+                        jsonString = Arrays.toString(couponDetailsList.toArray());
+                        Log.d("Wallet", "reached");
+                        Log.d("JsonString", jsonString);
+                        Log.d("SetServerString", "In Wallet SetServerString is : " + SetServerString);
+                        in.close();
+                        threadMsg(jsonString);
+                    }
+                } catch (Throwable t) {
+                    // just end the background thread
+                    Log.i("Animation", "Thread  exception " + t);
+                }
+            }
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
-            params.gravity=Gravity.CENTER;
-            buttonToAdd.setLayoutParams(params);
-            buttonToAdd.setBackgroundResource(R.drawable.red_coupon_top);
-            buttonToAdd.setText(couponDescription);
-            buttonToAdd.setGravity(Gravity.RIGHT);
-            buttonToAdd.setTextSize(20);
-            buttonToAdd.setAllCaps(false);
-            buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
+            private void threadMsg(String msg) {
+                if (!msg.equals(null) && !msg.equals("")) {
+                    Message msgObj = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("message", msg);
+                    msgObj.setData(b);
+                    handler.sendMessage(msgObj);
+                }
+            }
 
-            mainLinearLayout.addView(buttonToAdd, 0);
-        }
+            // Define the Handler that receives messages from the thread and update the progress
+            private final Handler handler = new Handler() {
+                public void handleMessage(Message msg) {
+                    String aResponse = msg.getData().getString("message");
+                    Log.d("aResponse", "In Handler aResponse is: " + aResponse);
+                    if ((null != aResponse)) {
+                        Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
+                        ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
+
+                        for (int i = 0; i < list.size(); i++) {
+                            Toast.makeText(
+                                    getBaseContext(),
+                                    "Server Response: " + list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
+                                    Toast.LENGTH_SHORT).show();
+                            displayCoupon(list.get(i).getCouponInfo(), list.get(i).getMerchant(), i);
+                            //btn.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
+                        }
+                    }
+                    else {
+                        // ALERT MESSAGE
+                        Toast.makeText(getBaseContext(), "Not Got Response From Server.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+        });
+        // Start Thread
+        background.start();
+
 
         //setContentView(R.layout.activity_wallet);
 
@@ -180,5 +263,39 @@ public class WalletActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void displayCoupon(String description, String merchant, int orderIndex){
+        mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
+        Button buttonToAdd = new Button(this);
+        String color = "bestbuy";
+        if(merchant.equals("TGIF"))
+            color = "red";
+        int backgroundID = getResources().getIdentifier(color + "_coupon_top", "drawable", getPackageName());
+        Log.d("displayCoupon", "description is: " + description + " merchant is: " + merchant + " order is: " + orderIndex);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1000, 200);
+        params.gravity=Gravity.CENTER;
+        params.topMargin=15;
+        buttonToAdd.setLayoutParams(params);
+        buttonToAdd.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        buttonToAdd.setBackgroundResource(backgroundID);
+        buttonToAdd.setText(merchant + ": " + description);
+        buttonToAdd.setGravity(Gravity.RIGHT);
+        buttonToAdd.setTextSize(20);
+        buttonToAdd.setAllCaps(false);
+        buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
+
+        mainLinearLayout.addView(buttonToAdd, orderIndex);
+    }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        //inputStream.close();
+        return result;
     }
 }

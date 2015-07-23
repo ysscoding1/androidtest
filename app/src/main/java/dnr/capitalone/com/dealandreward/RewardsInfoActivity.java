@@ -19,6 +19,28 @@ public class RewardsInfoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rewards_info);
 
+        Intent i = getIntent();
+        String totalDollarAmount = i.getStringExtra("totalDollarAmount");
+        String totalCentAmount = i.getStringExtra("totalCentAmount");
+        String firstLevelRewardsAmount = i.getStringExtra("firstLevelRewardsAmount");
+        String secondLevelRewardsAmount = i.getStringExtra("secondLevelRewardsAmount");
+        String thirdLevelRewardsAmount = i.getStringExtra("thirdLevelRewardsAmount");
+
+        textView = (TextView) findViewById(R.id.earnedDollarAmount);
+        textView.setText(totalDollarAmount);
+
+        textView = (TextView) findViewById(R.id.earnedCentAmount);
+        textView.setText(totalCentAmount);
+
+        textView = (TextView) findViewById(R.id.firstLevelRewardsAmount);
+        textView.setText(firstLevelRewardsAmount);
+
+        textView = (TextView) findViewById(R.id.secondLevelRewardsAmount);
+        textView.setText(secondLevelRewardsAmount);
+
+        textView = (TextView) findViewById(R.id.thirdLevelRewardsAmount);
+        textView.setText(thirdLevelRewardsAmount);
+
         imgButton = (ImageButton) findViewById(R.id.totalEarnedInfoButton);
         imgButton.setOnClickListener(new View.OnClickListener() {
             @Override

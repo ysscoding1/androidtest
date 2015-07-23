@@ -38,7 +38,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by RichardYan on 6/28/15.
@@ -112,6 +111,8 @@ public class LocationFragment extends Fragment {
 
         RestaurantCouponActivity restaurantCouponActivity = (RestaurantCouponActivity) getActivity();
         String zipCode = restaurantCouponActivity.getZipCode();
+
+
         if (zipCode == null)
             zipCode= "60173";
 
@@ -168,7 +169,6 @@ public class LocationFragment extends Fragment {
 
         googleMap = mMapView.getMap();
 
-
         // create marker
         MarkerOptions marker = new MarkerOptions().position(
                 new LatLng(latitude, longitude)).title( zipCode +" Location");
@@ -176,56 +176,21 @@ public class LocationFragment extends Fragment {
         // Changing marker icon
         marker.icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-/*
 
-        String SetServerString = "";
-        try {
-            String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+60007;
-            InputStream in = null;
-            java.net.URL url = new URL(urlString);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        Log.i("ZipCOde1:", zipCode);
+        // Create Inner Thread Class
+        //Thread background = new Thread(new UIMapProcess(zipCode, googleMap, inflater, savedInstanceState, v));
+        // Start Thread
+        //background.start();  //After call start method thread called run Method
 
+        //try {
+        //    background.wait();
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        // }
 
-            in = new BufferedInputStream(urlConnection.getInputStream());
-            // convert inputstream to string
-            if(in != null)
-                SetServerString = convertInputStreamToString(in);
-            else
-                SetServerString = "Did not work!";
+         googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
 
-        } catch (Throwable t) {
-            // just end the background thread
-            Log.i("Animation", "Thread  exception " + t);
-        }
-
-        Log.d("SetServerString", SetServerString);
-        if ((null != SetServerString)) {
-
-                        */
-/*Toast.makeText(
-                                getBaseContext(),
-                                "Server Response: "+aResponse,
-                                Toast.LENGTH_SHORT).show();
-                        Log.i("msg:", aResponse);*//*
-
-
-            // Button button =(Button) findViewById(R.id.tgif);
-            Type listType = new TypeToken<List<CouponDetails>>() {
-            }.getType();
-            ArrayList<CouponDetails> list = new Gson().fromJson(SetServerString, listType);
-*/
-
-            // adding marker
-            googleMap.addMarker(marker);
-
-           /* for (int i = 0; i < list.size(); i++) {
-                Double lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
-                Double log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
-                googleMap.addMarker(new MarkerOptions().position(new LatLng(lat,log)).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant()+ " \n "+ list.get(i).getAddress()));
-            }
-       }*/
-
-        // googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(latitude, longitude)).zoom(12).build();
@@ -300,26 +265,29 @@ public class LocationFragment extends Fragment {
     }
 
 
-    /*public class UIMapProcess implements Runnable
+    public class UIMapProcess implements Runnable
     {
         private LayoutInflater inflater;
-        private String zipCode;
-        private Bundle savedInstanceState;
-        private ViewGroup container;
-        public UIMapProcess(LayoutInflater _inflater, String _zipCode, Bundle _savedInstance, ViewGroup _container) {
-            this.inflater = _inflater;
-            this.zipCode = _zipCode;
-            savedInstanceState = _savedInstance;
-            container = _container;
+        private GoogleMap googleMap1;
+        private String zipcode;
+        private Bundle savedInstanceStateLocal;
+        private View vLocal;
+
+        public UIMapProcess(String _zipCode, GoogleMap _gMap, LayoutInflater _inflater, Bundle _savedInstance, View _v) {
+            googleMap1 = _gMap;
+            zipcode = _zipCode;
+            inflater = _inflater;
+            savedInstanceStateLocal = _savedInstance;
+            vLocal =_v;
         }
 
-        private String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+zipCode;
 
         // After call for background.start this run method call
         public void run() {
             try {
-
+                String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+zipcode;
                 InputStream in = null;
+                Log.i("Map URL", urlString);
                 java.net.URL url = new URL(urlString);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -356,59 +324,53 @@ public class LocationFragment extends Fragment {
 
                 String aResponse = msg.getData().getString("message");
 
+                Log.i("Map response:", aResponse);
+
                 if ((null != aResponse)) {
-
-                        *//*Toast.makeText(
-                                getBaseContext(),
-                                "Server Response: "+aResponse,
-                                Toast.LENGTH_SHORT).show();
-                        Log.i("msg:", aResponse);*//*
-
                     // Button button =(Button) findViewById(R.id.tgif);
                     Type listType = new TypeToken<List<CouponDetails>>() {
                     }.getType();
                     ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
 
-                    //LinearLayout[] lLayout = new LinearLayout[list.size()];
+                    mMapView = (MapView) vLocal.findViewById(R.id.mapView);
+                    mMapView.onCreate(savedInstanceStateLocal);
+
+                   // mMapView.onResume();// needed to get the map to display immediately
+
+                    /*try {
+                        MapsInitializer.initialize(getActivity().getApplicationContext());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }*/
+
                     googleMap = mMapView.getMap();
-                    View v = inflater.inflate(R.layout.fragment_location, container,
-                            false);
+
+                    Double lat = 0.0;
+                    Double log = 0.0;
+
+                    Log.i("response cust list", String.valueOf(list.size()));
+
                     for (int i = 0; i < list.size(); i++) {
 
-                        mMapView = (MapView) v.findViewById(R.id.mapView);
-                        mMapView.onCreate(savedInstanceState);
-
-                        mMapView.onResume();// needed to get the map to display immediately
-
-                        try {
-                            MapsInitializer.initialize(getActivity().getApplicationContext());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                            // create marker
-                            MarkerOptions marker = new MarkerOptions().position(
-                                    new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).title(zipCode + " Location");
-
-                            // Changing marker icon
-                            marker.icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-*//*
                         // adding marker
                         //                          googleMap.addMarker(marker);
 
-                        Double lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
-                        Double log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
-                        googleMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant()+ " \n "+ list.get(i).getAddress()));
-
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(Double.valueOf(list.get(i).getLat()), Double.valueOf(list.get(i).getLng()))).zoom(12).build();
-                        googleMap.animateCamera(CameraUpdateFactory
-                                .newCameraPosition(cameraPosition));
+                        lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
+                        log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
+                        Log.i("Merchant:", list.get(i).getMerchant());
+                        Log.i("lat value:" , lat.toString());
+                        Log.i("log value:", log.toString());
+                        googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, log)).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant() + " \n " + list.get(i).getAddress()));
 
                     }
+
+                    //CameraPosition cameraPosition = new CameraPosition.Builder()
+                      //      .target(new LatLng(lat, log)).zoom(12).build();
+                    //googleMap.animateCamera(CameraUpdateFactory
+                    //        .newCameraPosition(cameraPosition));
+
                 }
             }
         };
-    }*/
+    }
 }

@@ -53,6 +53,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class RestaurantCouponActivity extends FragmentActivity implements LocationFragment.OnFragmentInteractionListener {
@@ -221,14 +222,6 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                            // btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                         }
 
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                        // for (LinearLayout ll1 : lLayout)
-                        // {
-                        //     ll.addView(ll1, params);
-                        // }
                     }
                     else
                     {
@@ -356,8 +349,10 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
 
                 SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
                         "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+                Map<String, ?> prefFilesMap = sharedPref.getAll();
 
-                String userName = sharedPref.getString("username", "bkadali@gmail.com");
+
+                String userName = prefFilesMap.get("username").toString();
 
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUris);

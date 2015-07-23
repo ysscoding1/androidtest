@@ -129,6 +129,120 @@
             <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
             <LinearLayout
+                android:id="@+id/firstLevelRewardsLayout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20pt"
+                android:layout_gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/firstLevelRewardsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="First Level Rewards"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center"
+                    android:drawablePadding="5dp"
+                    android:paddingLeft="10dp"/>
+                <TextView
+                    android:id="@+id/firstLevelRewardsAmount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center|right"
+                    android:paddingRight="10dp"/>
+            </LinearLayout>
+
+            <!-- Separator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <View
+                android:id="@+id/separator1"
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:background="#FFFFFF"/>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+            <LinearLayout
+                android:id="@+id/secondLevelRewardsLayout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20pt"
+                android:layout_gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/secondLevelRewardsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Second Level Rewards"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center"
+                    android:drawablePadding="5dp"
+                    android:paddingLeft="10dp"/>
+                <TextView
+                    android:id="@+id/secondLevelRewardsAmount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center|right"
+                    android:paddingRight="10dp"/>
+            </LinearLayout>
+
+            <!-- Separator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <View
+                android:id="@+id/separator2"
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:background="#FFFFFF"/>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+            <LinearLayout
+                android:id="@+id/thirdLevelRewardsLayout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20pt"
+                android:layout_gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/thirdLevelRewardsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Third Level Rewards"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center"
+                    android:drawablePadding="5dp"
+                    android:paddingLeft="10dp"/>
+                <TextView
+                    android:id="@+id/thirdLevelRewardsAmount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8pt"
+                    android:gravity="center|right"
+                    android:paddingRight="10dp"/>
+            </LinearLayout>
+
+            <!-- Separator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <View
+                android:id="@+id/separator3"
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:background="#FFFFFF"/>
+            <!--<LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
@@ -241,8 +355,7 @@
                         android:textColor="#000000"/>
                 </LinearLayout>
 
-
-            </LinearLayout>
+            </LinearLayout>-->
 
 
         </LinearLayout>

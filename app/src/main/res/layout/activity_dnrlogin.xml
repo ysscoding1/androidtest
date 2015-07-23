@@ -32,12 +32,23 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/welcomeImage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/header"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="800px"
+                android:src = "@drawable/c1office"/>
+        </LinearLayout>
+        <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/header"
-            android:layout_marginTop="140px"
+            android:layout_below="@+id/welcomeImage"
+            android:layout_marginTop="20px"
             android:id="@+id/mainLevel">
             <LinearLayout
                 android:orientation="vertical"
@@ -57,7 +68,7 @@
 
                 <Button android:id="@+id/email_sign_in_button" style="?android:textAppearanceSmall"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" android:text="Login In"
+                    android:layout_marginTop="16dp" android:text="Login"
                     android:textStyle="bold" />
             </LinearLayout>
 

@@ -66,10 +66,15 @@ public class MoneyEarnedActivity extends Activity {
             private String jsonString = "";
             private String SetServerString = "";
             private String email = "";
+
+
             // After call for background.start this run method call
             public void run() {
+                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                        "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                email = sharedPref.getString("username", "bkadali@gmail.com");
                 try {
-                    String email = "mycusto@cust.com";
                     if (email.equals("") != true) {
                         String urlString = "http://52.5.81.122:8080/rewards/totalrewards/" + email;
                         java.net.URL url = new URL(urlString);

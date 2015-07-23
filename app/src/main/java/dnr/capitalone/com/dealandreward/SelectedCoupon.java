@@ -39,6 +39,10 @@ public class SelectedCoupon extends ActionBarActivity {
             value = extras.getString("couponSelected");
             urlString+=value;
             ImageView imgView = (ImageView) findViewById(R.id.couponstodisplay);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    1000,
+                    500);
+            imgView.setLayoutParams(params);
             new DownloadImageTask(imgView)
                     .execute(urlString);
 

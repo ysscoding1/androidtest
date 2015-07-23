@@ -142,12 +142,18 @@ public class WalletActivity extends ActionBarActivity {
                         Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
                         ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
 
+                       /* SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                                "walletPrefFiles", Context.MODE_PRIVATE);
+                        Map <String, ?> prefFilesMap = sharedPref.getAll();
+                        String couponIDs = (String) prefFilesMap.get("couponIDs");
+                        Set<String> couponIDSet = new HashSet<String>(Arrays.asList(couponIDs.split(",")));*/
+
                         for (int i = 0; i < list.size(); i++) {
                             Toast.makeText(
                                     getBaseContext(),
                                     "Server Response: " + list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
                                     Toast.LENGTH_SHORT).show();
-                            displayCoupon(list.get(i).getCouponInfo(), list.get(i).getMerchant(), i);
+                            displayCoupon(list.get(i).getCouponInfo(), list.get(i).getMerchant(), i, list.get(i).getCouponId());
                             //btn.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
                         }
                     }
@@ -160,16 +166,6 @@ public class WalletActivity extends ActionBarActivity {
         });
         // Start Thread
         background.start();
-
-
-        Button b = (Button)findViewById(R.id.rewardButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(WalletActivity.this, RewardRedeemActivity.class);
-                startActivity(i);
-            }
-        });
 
         //setContentView(R.layout.activity_wallet);
 
@@ -279,7 +275,7 @@ public class WalletActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void displayCoupon(String description, String merchant, int orderIndex){
+    public void displayCoupon(String description, String merchant, int orderIndex, String couponID){
         mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
         Button buttonToAdd = new Button(this);
         String color = "bestbuy";
@@ -298,7 +294,7 @@ public class WalletActivity extends ActionBarActivity {
         buttonToAdd.setTextSize(20);
         buttonToAdd.setAllCaps(false);
         buttonToAdd.setTextColor(Color.parseColor("#FFFFFF"));
-
+        buttonToAdd.setOnClickListener(new SelectedCouponListener(couponID));
         mainLinearLayout.addView(buttonToAdd, orderIndex);
     }
 
@@ -312,4 +308,24 @@ public class WalletActivity extends ActionBarActivity {
         //inputStream.close();
         return result;
     }
+
+    public class SelectedCouponListener implements View.OnClickListener
+    {
+
+        String couponID;
+        public SelectedCouponListener(String couponID) {
+            this.couponID = couponID;
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                    "dealnrewardPrefFiles", Context.MODE_PRIVATE);
+            Intent i = new Intent(WalletActivity.this, RewardRedeemActivity.class);
+            i.putExtra("clickedCouponID", couponID);
+            startActivity(i);
+        }
+
+    };
 }

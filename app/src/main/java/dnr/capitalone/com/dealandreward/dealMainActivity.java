@@ -141,6 +141,7 @@ public class dealMainActivity extends ActionBarActivity {
 
                 String userName = sharedPref.getString("username", "bkadali@gmail.com");
 
+
                 Log.i("username", userName);
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUris);

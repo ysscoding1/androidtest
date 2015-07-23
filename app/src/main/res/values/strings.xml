@@ -13,6 +13,7 @@
         <string name="title_activity_wallet">WalletActivity</string>
         <string name="title_activity_money_earned">MoneyEarnedActivity</string>
         <string name="title_activity_rewards_info">RewardsInfoActivity</string>
+        <string name="title_activity_reward_redeem">RewardRedeemActivity</string>
         <string name="restaurants">Restaurants</string>
         <string name="retailers">Retailers</string>
         <string name="services">Services</string>

@@ -121,12 +121,12 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         textview.setTypeface(headerTypeface);
 
         /* Map */
-        //fragmentManager = getFragmentManager();
-        //FragmentTransaction ft = fragmentManager.beginTransaction();
+        fragmentManager = getFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
 
-        //LocationFragment lf = new LocationFragment();
-        //ft.replace(R.id.mapView, lf);
-        //ft.commit();
+        LocationFragment lf = new LocationFragment();
+        ft.replace(R.id.mapView, lf);
+        ft.commit();
 
 
         // Create Inner Thread Class

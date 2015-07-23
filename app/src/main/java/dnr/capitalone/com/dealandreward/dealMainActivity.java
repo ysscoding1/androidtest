@@ -10,6 +10,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -135,10 +136,16 @@ public class dealMainActivity extends ActionBarActivity {
                 Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1));
                 imageUris.add(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(R.drawable.c1) + '/' + resources.getResourceTypeName(R.drawable.c1) + '/' + resources.getResourceEntryName(R.drawable.c1)));
 
+                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                        "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                String userName = sharedPref.getString("username", "bkadali@gmail.com");
+
+                Log.i("username", userName);
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUris);
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId=bkadali@gmail.com");
+                intent.putExtra(Intent.EXTRA_TEXT, "Download CapitalOne Deals 'n Rewards App \n http://52.5.81.122:8080/Customer.html?referalId="+userName);
                 startActivity(Intent.createChooser(intent,"compatible apps:"));
             }
         });

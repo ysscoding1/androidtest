@@ -28,14 +28,14 @@ public class RewardRedeemActivity extends Activity {
         String value = "";
 
         Bundle extras = getIntent().getExtras();
-        String urlString = "http://52.5.81.122:8080/retreive/image/grocery/";
-        if (extras != null) {
-            value = extras.getString("couponToRedeem");
-            urlString += value;
-            ImageView imgView = (ImageView) findViewById(R.id.couponstodisplay);
+        String urlString = "http://52.5.81.122:8080/retreive/image/grocery/15";
+       // if (extras != null) {
+          //  value = extras.getString("couponToRedeem");
+            //urlString += value;
+            ImageView imgView = (ImageView) findViewById(R.id.couponstoRedeem);
             new DownloadImageTask(imgView)
                     .execute(urlString);
-        }
+        //}
 
         Button button =(Button) findViewById(R.id.clipCouponButton);
         button.setOnClickListener(new SCListener(value));
@@ -54,8 +54,14 @@ public class RewardRedeemActivity extends Activity {
         public void onClick(View v)
         {
             try{
+
+
+                SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                        "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                String userName = sharedPref.getString("username", "bkadali@gmail.com");
             //call the redeem service
-            String urlString = "http://52.5.81.122:8080/retreive/image/grocery/"+selectedCoupon;
+            String urlString = "http://52.5.81.122:8080/rewards/gained/"+userName;
             InputStream in = null;
             java.net.URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

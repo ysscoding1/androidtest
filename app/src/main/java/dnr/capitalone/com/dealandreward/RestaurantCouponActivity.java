@@ -3,6 +3,7 @@ package dnr.capitalone.com.dealandreward;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -120,12 +121,12 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         textview.setTypeface(headerTypeface);
 
         /* Map */
-        fragmentManager = getFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
+        //fragmentManager = getFragmentManager();
+        //FragmentTransaction ft = fragmentManager.beginTransaction();
 
-        LocationFragment lf = new LocationFragment();
-        ft.replace(R.id.mapView, lf);
-        ft.commit();
+        //LocationFragment lf = new LocationFragment();
+        //ft.replace(R.id.mapView, lf);
+        //ft.commit();
 
 
         // Create Inner Thread Class
@@ -281,6 +282,9 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         }*/
 
         final EditText editText = (EditText) findViewById(R.id.locationInput);
+
+        InputMethodManager imm = (InputMethodManager)this.getSystemService(Service.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromInputMethod(editText.getWindowToken(),0);
 
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override

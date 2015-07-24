@@ -130,8 +130,9 @@ public class LocationFragment extends Fragment {
                 latitude = address.getLatitude();
                 longitude = address.getLongitude();
             } else {
+                Log.e("Error", "Unable to find ZipCode");
                 // Display appropriate message when Geocoder services are not available
-                Toast.makeText(getActivity(), "Unable to geocode zipcode", Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getActivity(), "Unable to geocode zipcode", Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             // handle exception
@@ -200,7 +201,7 @@ public class LocationFragment extends Fragment {
         //    e.printStackTrace();
         // }
 
-         googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
+         //googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
 
         Double lat=0.0;
         Double log=0.0;
@@ -211,7 +212,8 @@ public class LocationFragment extends Fragment {
             Log.i("Merchant:", d.getMerchant());
             Log.i("lat value:" , lat.toString());
             Log.i("log value:", log.toString());
-            googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, log)).title(d.getMerchant()).snippet(d.getMerchant() + " \n " + d.getAddress()));
+
+            googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, log)).title(d.getMerchant()).snippet(d.getMerchant() + " \n " + (d.getAddress() == null ? "" :d.getAddress())));
 
         }
 

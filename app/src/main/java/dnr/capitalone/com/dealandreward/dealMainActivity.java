@@ -61,7 +61,6 @@ public class dealMainActivity extends ActionBarActivity {
         button = (Button)findViewById(R.id.restaurantButton);
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
-        button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +72,6 @@ public class dealMainActivity extends ActionBarActivity {
         button = (Button)findViewById(R.id.retailersButton);
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
-        button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +84,6 @@ public class dealMainActivity extends ActionBarActivity {
         button = (Button)findViewById(R.id.servicesButton);
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
-        button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +96,6 @@ public class dealMainActivity extends ActionBarActivity {
         button = (Button)findViewById(R.id.otherButton);
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
-        button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,11 +107,19 @@ public class dealMainActivity extends ActionBarActivity {
         button = (Button)findViewById(R.id.rewardsButton);
         buttonTypeface = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         button.setTypeface(buttonTypeface);
-        button.setOnTouchListener(new ButtonPushedOnTouchListener(button));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(dealMainActivity.this, MoneyEarnedActivity.class);
+                startActivity(i);
+            }
+        });
+
+        imgButton = (ImageButton) findViewById(R.id.profileIcon);
+        imgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(dealMainActivity.this, UserProfileActivity.class);
                 startActivity(i);
             }
         });

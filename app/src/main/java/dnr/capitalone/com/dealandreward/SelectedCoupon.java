@@ -141,9 +141,14 @@ public class SelectedCoupon extends ActionBarActivity {
         @Override
         public void onClick(View v)
         {
+            SharedPreferences sharedPref1 = getBaseContext().getSharedPreferences(
+                    "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+            String email = sharedPref1.getString("username", "bkadali@gmail.com");
             //  Toast.makeText(getApplicationContext(), "Getting:" , Toast.LENGTH_SHORT);
-            SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+            SharedPreferences sharedPref = getBaseContext().getSharedPreferences(email +
                     "walletPrefFiles", Context.MODE_PRIVATE);
+
             SharedPreferences.Editor editor = sharedPref.edit();
             Map<String, ?> prefFilesMap = sharedPref.getAll();
             if (prefFilesMap.isEmpty() == true) {

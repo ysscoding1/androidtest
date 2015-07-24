@@ -64,8 +64,13 @@ public class WalletActivity extends ActionBarActivity {
             // After call for background.start this run method call
             public void run() {
                 try {
-                    SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
-                    "walletPrefFiles", Context.MODE_PRIVATE);
+                    SharedPreferences sharedPref1 = getBaseContext().getSharedPreferences(
+                            "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                    String email = sharedPref1.getString("username", "bkadali@gmail.com");
+
+                    SharedPreferences sharedPref = getBaseContext().getSharedPreferences(email +
+                            "walletPrefFiles", Context.MODE_PRIVATE);
                     Map <String, ?> prefFilesMap = sharedPref.getAll();
                     String couponIDs;
                     mainLinearLayout = (LinearLayout) findViewById(R.id.mainLevelWallet);
@@ -149,17 +154,11 @@ public class WalletActivity extends ActionBarActivity {
                         Set<String> couponIDSet = new HashSet<String>(Arrays.asList(couponIDs.split(",")));*/
 
                         for (int i = 0; i < list.size(); i++) {
-                            Toast.makeText(
-                                    getBaseContext(),
-                                    "Server Response: " + list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
-                                    Toast.LENGTH_SHORT).show();
                             displayCoupon(list.get(i).getCouponInfo(), list.get(i).getMerchant(), i, list.get(i).getCouponId());
-                            //btn.setOnClickListener(new SelectedCouponListiner(list.get(i).getCouponId()));
                         }
                     }
                     else {
-                        // ALERT MESSAGE
-                        Toast.makeText(getBaseContext(), "Not Got Response From Server.", Toast.LENGTH_SHORT).show();
+                        Log.e("Error", "No Response From Server in Wallet");
                     }
                 }
             };

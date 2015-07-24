@@ -35,13 +35,13 @@
             android:id="@+id/welcomeImage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/header"
-            android:gravity="center">
+            android:layout_below="@+id/header">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="800px"
                 android:src = "@drawable/c1office"/>
         </LinearLayout>
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -49,28 +49,36 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/welcomeImage"
             android:layout_marginTop="20px"
+            android:gravity="center"
             android:id="@+id/mainLevel">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <AutoCompleteTextView android:id="@+id/email" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:hint="enter email address"
-                    android:inputType="textEmailAddress" android:maxLines="1"
-                    android:singleLine="true" />
-
-                <EditText android:id="@+id/password" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:hint="(Optional) enter password"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="Enter password"
-                    android:imeOptions="actionUnspecified" android:inputType="textPassword"
-                    android:maxLines="1" android:singleLine="true" />
-
-                <Button android:id="@+id/email_sign_in_button" style="?android:textAppearanceSmall"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" android:text="Login"
-                    android:textStyle="bold" />
-            </LinearLayout>
+            <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:stretchColumns="1">
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/autocomplete_cell">
+                    <AutoCompleteTextView android:id="@+id/email" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:hint="Enter e-mail address"
+                        android:inputType="textEmailAddress" android:maxLines="1"
+                        android:singleLine="true" />
+                </TableRow>
+                <TableRow>
+                    <EditText android:id="@+id/password" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:hint="(Optional) enter password"
+                        android:imeActionId="@+id/login"
+                        android:imeActionLabel="Enter password"
+                        android:imeOptions="actionUnspecified" android:inputType="textPassword"
+                        android:maxLines="1" android:singleLine="true" />
+                </TableRow>
+                <TableRow>
+                    <Button android:id="@+id/email_sign_in_button" style="?android:textAppearanceSmall"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp" android:text="Login"
+                        android:textStyle="bold" />
+                </TableRow>
+            </TableLayout>
 
         </LinearLayout>
 

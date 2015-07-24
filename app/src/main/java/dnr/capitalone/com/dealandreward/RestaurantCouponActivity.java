@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -121,7 +123,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     if(in != null)
                         SetServerString = convertInputStreamToString(in);
                     else
-                        SetServerString = "Did not work!";//Toast.makeText(getApplicationContext(),"ServerString: "+ SetServerString,Toast.LENGTH_SHORT);
+                        SetServerString = "Did not work!";
                     threadMsg(SetServerString);
                     Log.d("SetServerString", "String is: " + SetServerString);
                 } catch (Throwable t) {
@@ -156,32 +158,20 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                                 Toast.LENGTH_SHORT).show();
                         Log.i("msg:", aResponse);*/
 
+                        Log.i("msg:", aResponse);
                         // Button button =(Button) findViewById(R.id.tgif);
                         Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
                         ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
-                        Log.d("CouponList", "List is: " + list);
+                       // Log.d("CouponList", "List is: " + list);
 
                         // button.setText(list.get(0).getMerchant() + "\t\t" + list.get(0).getCouponInfo());
 
-                         /* Map */
-                        fragmentManager = getFragmentManager();
-                        FragmentTransaction ft = fragmentManager.beginTransaction();
 
-                        LocationFragment lf = new LocationFragment();
-                        Bundle b = new Bundle();
-                        b.putSerializable("locationList", list);
-                        lf.setArguments(b);
-                        ft.replace(R.id.mapView, lf);
 
-                        ft.commit();
 
                         LinearLayout ll = (LinearLayout)findViewById(R.id.mapLevel);
-                        for (int i = 0; i < list.size(); i++) {
-                            Toast.makeText(
-                                    getBaseContext(),
-                                    "Server Response: "+list.get(i).getMerchant() + "\t\t" + list.get(i).getCouponInfo(),
-                                    Toast.LENGTH_SHORT).show();
 
+                        for (int i = 0; i < list.size(); i++) {
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.MATCH_PARENT,
                                     89);
@@ -203,42 +193,58 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             ((TextView)repeatedCouponButtonLayout.findViewById(R.id.couponButtonFrameDescription)).setText(list.get(i).getCouponInfo());
                             repeatedCouponButtonLayout.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                             ll.addView(repeatedCouponButtonLayout, params);
+                        }
+                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        // Define the criteria how to select the location provider
+                        Criteria criteria = new Criteria();
+                        criteria.setAccuracy(Criteria.ACCURACY_COARSE);   //default
 
-                            /*Button btn = new Button(getApplicationContext());
-                            btn.setId(i);
-                            btn.setCompoundDrawablesWithIntrinsicBounds( R.drawable.restauranticon25, 0, 0, 0);
-                            final int id_ = btn.getId();
-                            btn.setText(list.get(i).getMerchant() +"\t\t\t\t\t"+ list.get(i).getCouponInfo());
-                            //btn.setBackgroundColor(Color.rgb(70, 80, 90));
-                            //btn.setText("Hello World");
+                        // user defines the criteria
 
-                            if (i%2==0) {
-                                btn.setBackgroundColor(Color.LTGRAY);
+                        criteria.setCostAllowed(false);
+                        // get the best provider depending on the criteria
+                        String provider = locationManager.getBestProvider(criteria, false);
+
+                        // the last known location of this provider
+                        Location location = locationManager.getLastKnownLocation(provider);
+
+                        if (list.isEmpty()) {
+                            CouponDetails c = new CouponDetails();
+                            c.setMerchant("Current Location");
+                            if (location != null)
+                            {
+                                c.setLat(String.valueOf(location.getLatitude()));
+                                c.setLng(String.valueOf(location.getLongitude()));
+                                Log.d("Lat", String.valueOf(location.getLatitude()));
+                                Log.d("Long", String.valueOf(location.getLongitude()));
                             }
                             else
                             {
-                                btn.setBackgroundColor(Color.DKGRAY);
+                                c.setLat(String.valueOf(0.0));
+                                c.setLng(String.valueOf(0.0));
                             }
-                            btn.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
-                            ll.addView(btn, params);*/
-                            //idName = list.get(i).getCouponId();
-
-                            /* BHANU? Button btn1 = ((Button) findViewById(id_));
-                            btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));*/
-                           // Button btn1 = ((Button) findViewById(id_));
-                           // btn1.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
+                            list.add(c);
                         }
+
+                         /* Map */
+                        fragmentManager = getFragmentManager();
+                        FragmentTransaction ft = fragmentManager.beginTransaction();
+
+                        LocationFragment lf = new LocationFragment();
+                        Bundle b = new Bundle();
+                        b.putSerializable("locationList", list);
+                        lf.setArguments(b);
+                        ft.replace(R.id.mapView, lf);
+
+                        ft.commit();
 
                     }
                     else
                     {
-
-                        // ALERT MESSAGE
-                        Toast.makeText(
-                                getBaseContext(),
-                                "Not Got Response From Server.",
-                                Toast.LENGTH_SHORT).show();
+                        Log.e("Error","No Response from Server in Restaurant Activity!");
                     }
+
+
 
                 }
             };
@@ -288,7 +294,6 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 editor.putString("zipcode", editText.getText().toString());*/
                 if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    Toast.makeText(getBaseContext(), "DOne focus", Toast.LENGTH_SHORT).show();
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                     /*Bundle bundle = new Bundle();
@@ -303,7 +308,6 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                     startActivity(i);
                     return true;
                 }
-                Toast.makeText(getBaseContext(), "didn't get focus", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -537,7 +541,6 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         if (requestCode == 1) {
             // Make sure the request was successful
             Uri dataValue = data.getData();
-            Toast.makeText(this, dataValue.toString(), Toast.LENGTH_LONG);
         }
     }
 
@@ -576,5 +579,6 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         return result;
 
     }
+
 
 }

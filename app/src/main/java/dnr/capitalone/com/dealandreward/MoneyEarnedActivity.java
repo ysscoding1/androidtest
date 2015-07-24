@@ -139,8 +139,7 @@ public class MoneyEarnedActivity extends Activity {
 
                     }
                     else {
-                        // ALERT MESSAGE
-                        Toast.makeText(getBaseContext(), "Not Got Response From Server.", Toast.LENGTH_SHORT).show();
+                        Log.e("Error", "No Response From Server in Money Earned Activity");
                     }
                 }
             };

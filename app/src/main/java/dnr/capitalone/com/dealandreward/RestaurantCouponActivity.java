@@ -52,6 +52,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -97,13 +98,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         headerTypeface= Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         textview.setTypeface(headerTypeface);
 
-        /* Map */
-        fragmentManager = getFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
 
-        LocationFragment lf = new LocationFragment();
-        ft.replace(R.id.mapView, lf);
-        ft.commit();
 
 
         // Create Inner Thread Class
@@ -167,6 +162,18 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                         Log.d("CouponList", "List is: " + list);
 
                         // button.setText(list.get(0).getMerchant() + "\t\t" + list.get(0).getCouponInfo());
+
+                         /* Map */
+                        fragmentManager = getFragmentManager();
+                        FragmentTransaction ft = fragmentManager.beginTransaction();
+
+                        LocationFragment lf = new LocationFragment();
+                        Bundle b = new Bundle();
+                        b.putSerializable("locationList", list);
+                        lf.setArguments(b);
+                        ft.replace(R.id.mapView, lf);
+
+                        ft.commit();
 
                         LinearLayout ll = (LinearLayout)findViewById(R.id.mapLevel);
                         for (int i = 0; i < list.size(); i++) {

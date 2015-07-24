@@ -138,13 +138,24 @@ public class LocationFragment extends Fragment {
         }
         //}
 
+        Bundle args = getArguments();
+        ArrayList<CouponDetails> couponDetails =  (ArrayList<CouponDetails>)args.getSerializable("locationList");
 
 
         // Create Inner Thread Class
-        //Thread background = new Thread(new UIMapProcess(inflater,zipCode, savedInstanceState, container));
+      //  Thread background = new Thread(new UIMapProcess(zipCode, googleMap, inflater, savedInstanceState, container));
         // Start Thread
-        //background.start();  //After call start method thread called run Method
+       // background.start();  //After call start method thread called run Method
 
+     //   synchronized( background ) {
+       //     getActivity().runOnUiThread(background) ;
+
+         //   try {
+          //      background.wait() ; // unlocks myRunable while waiting
+           // } catch (InterruptedException e) {
+             //   e.printStackTrace();
+            //}
+        //}
 
        /* Uri gmmIntentUri = Uri.parse("geo:0,0?q=restaurants");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -191,9 +202,21 @@ public class LocationFragment extends Fragment {
 
          googleMap.addMarker(new MarkerOptions().position(new LatLng(42.050123, -88.042236)).title("tgif").snippet("TGIF \n 1695 E Golf Rd, Schaumburg, IL 60173"));
 
+        Double lat=0.0;
+        Double log=0.0;
+        for(CouponDetails d : couponDetails)
+        {
+            lat = Double.valueOf(d.getLat()) == null ? 42.050123 : Double.valueOf(d.getLat());
+            log = Double.valueOf(d.getLng())  == null ? -88.042236 : Double.valueOf(d.getLng()) ;
+            Log.i("Merchant:", d.getMerchant());
+            Log.i("lat value:" , lat.toString());
+            Log.i("log value:", log.toString());
+            googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, log)).title(d.getMerchant()).snippet(d.getMerchant() + " \n " + d.getAddress()));
+
+        }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(latitude, longitude)).zoom(12).build();
+                .target(new LatLng(lat, log)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
 
@@ -262,115 +285,5 @@ public class LocationFragment extends Fragment {
         inputStream.close();
         return result;
 
-    }
-
-
-    public class UIMapProcess implements Runnable
-    {
-        private LayoutInflater inflater;
-        private GoogleMap googleMap1;
-        private String zipcode;
-        private Bundle savedInstanceStateLocal;
-        private View vLocal;
-
-        public UIMapProcess(String _zipCode, GoogleMap _gMap, LayoutInflater _inflater, Bundle _savedInstance, View _v) {
-            googleMap1 = _gMap;
-            zipcode = _zipCode;
-            inflater = _inflater;
-            savedInstanceStateLocal = _savedInstance;
-            vLocal =_v;
-        }
-
-
-        // After call for background.start this run method call
-        public void run() {
-            try {
-                String urlString = "http://52.5.81.122:8080/retreive/coupon/restuarent/"+zipcode;
-                InputStream in = null;
-                Log.i("Map URL", urlString);
-                java.net.URL url = new URL(urlString);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                String SetServerString = "";
-                in = new BufferedInputStream(urlConnection.getInputStream());
-                // convert inputstream to string
-                if(in != null)
-                    SetServerString = convertInputStreamToString(in);
-                else
-                    SetServerString = "Did not work!";
-                threadMsg(SetServerString);
-
-            } catch (Throwable t) {
-                // just end the background thread
-                Log.i("Animation", "Thread  exception " + t);
-            }
-        }
-
-        private void threadMsg(String msg) {
-
-            if (!msg.equals(null) && !msg.equals("")) {
-                Message msgObj = handler.obtainMessage();
-                Bundle b = new Bundle();
-                b.putString("message", msg);
-                msgObj.setData(b);
-                handler.sendMessage(msgObj);
-            }
-        }
-
-        // Define the Handler that receives messages from the thread and update the progress
-        private final Handler handler = new Handler() {
-
-            public void handleMessage(Message msg) {
-
-                String aResponse = msg.getData().getString("message");
-
-                Log.i("Map response:", aResponse);
-
-                if ((null != aResponse)) {
-                    // Button button =(Button) findViewById(R.id.tgif);
-                    Type listType = new TypeToken<List<CouponDetails>>() {
-                    }.getType();
-                    ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
-
-                    mMapView = (MapView) vLocal.findViewById(R.id.mapView);
-                    mMapView.onCreate(savedInstanceStateLocal);
-
-                   // mMapView.onResume();// needed to get the map to display immediately
-
-                    /*try {
-                        MapsInitializer.initialize(getActivity().getApplicationContext());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
-
-                    googleMap = mMapView.getMap();
-
-                    Double lat = 0.0;
-                    Double log = 0.0;
-
-                    Log.i("response cust list", String.valueOf(list.size()));
-
-                    for (int i = 0; i < list.size(); i++) {
-
-                        // adding marker
-                        //                          googleMap.addMarker(marker);
-
-                        lat = Double.valueOf(list.get(i).getLat()) == null ? 42.050123 : Double.valueOf(list.get(i).getLat());
-                        log = Double.valueOf(list.get(i).getLng())  == null ? -88.042236 : Double.valueOf(list.get(i).getLng()) ;
-                        Log.i("Merchant:", list.get(i).getMerchant());
-                        Log.i("lat value:" , lat.toString());
-                        Log.i("log value:", log.toString());
-                        googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, log)).title(list.get(i).getMerchant()).snippet(list.get(i).getMerchant() + " \n " + list.get(i).getAddress()));
-
-                    }
-
-                    //CameraPosition cameraPosition = new CameraPosition.Builder()
-                      //      .target(new LatLng(lat, log)).zoom(12).build();
-                    //googleMap.animateCamera(CameraUpdateFactory
-                    //        .newCameraPosition(cameraPosition));
-
-                }
-            }
-        };
     }
 }

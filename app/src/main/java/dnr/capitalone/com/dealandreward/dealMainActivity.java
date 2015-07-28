@@ -1,13 +1,20 @@
 package dnr.capitalone.com.dealandreward;
 
+import android.app.Notification;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.location.Location;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +35,24 @@ import android.transition.TransitionManager;
 import android.view.animation.Animation;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.location.LocationListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class dealMainActivity extends ActionBarActivity {
@@ -45,6 +70,9 @@ public class dealMainActivity extends ActionBarActivity {
         //Facebook.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_deal_main);
 
+        Toast.makeText(getApplicationContext(), "calling start service" , Toast.LENGTH_SHORT).show();
+        startService(new Intent(this, LocationService.class));
+        Toast.makeText(getApplicationContext(), "done calling start service" , Toast.LENGTH_SHORT).show();
         /* TODO: CHANGE~~   Clear When Coupon is Used or Deleted */
         /*SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
                 "walletPrefFiles", Context.MODE_PRIVATE);
@@ -210,4 +238,41 @@ public class dealMainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private  class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // Initialize the location fields
+            //  latitude.setText("Latitude: "+String.valueOf(location.getLatitude()));
+            //  longitude.setText("Longitude: "+String.valueOf(location.getLongitude()));
+            // provText.setText(provider + " provider has been selected.");
+
+
+        }
+/*
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+      //  Toast.makeText(MainActivity.this, provider + "'s status changed to "+status +"!",
+       //         Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+       // Toast.makeText(MainActivity.this, "Provider " + provider + " enabled!",
+         //       Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+       // Toast.makeText(MainActivity.this, "Provider " + provider + " disabled!",
+        //        Toast.LENGTH_SHORT).show();
+    }
+*/
+    }
+
+
 }

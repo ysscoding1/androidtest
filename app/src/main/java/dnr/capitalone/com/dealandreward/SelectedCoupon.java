@@ -1,12 +1,17 @@
 package dnr.capitalone.com.dealandreward;
 
+import android.app.Notification;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -172,6 +177,49 @@ public class SelectedCoupon extends ActionBarActivity {
 
             //String allIds = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("walletPrefFiles", "");
             //Toast.makeText(getApplicationContext(), "All Ids: "+ allIds , Toast.LENGTH_SHORT);
+
+
+            // Main Notification Object
+            NotificationCompat.Builder wearNotificaiton = new NotificationCompat.Builder(SelectedCoupon.this)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setSmallIcon(R.drawable.wallet)
+                    .setWhen(System.currentTimeMillis())
+                    .setTicker("Wallet Icon")
+                    .setContentTitle("Text 1")
+                    .setContentText("Hello");
+
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
+            Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.c1);
+
+
+            // Create second page
+            Notification TrendPage =
+                    new NotificationCompat.Builder(SelectedCoupon.this)
+                            .setLargeIcon(bm)
+                            .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bm))
+                            .build();
+
+            // Create third page
+            Notification ChartPage =
+                    new NotificationCompat.Builder(SelectedCoupon.this)
+                            .setLargeIcon(bm1)
+                            .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bm1))
+                            .setContentTitle("test title 1")
+                            .build();
+
+            // Extend the notification builder with the second page
+            Notification notification = wearNotificaiton
+                    .extend(new NotificationCompat.WearableExtender()
+                            .addPage(TrendPage).addPage(ChartPage))
+                    .build();
+
+            // Issue the notification
+            // Get an instance of the NotificationManager service
+            NotificationManagerCompat notificationManager =
+                    NotificationManagerCompat.from(getApplicationContext());
+            notificationManager =
+                    NotificationManagerCompat.from(SelectedCoupon.this);
+            notificationManager.notify(01, notification);
         }
 
     }

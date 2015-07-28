@@ -2,6 +2,7 @@ package dnr.capitalone.com.dealandreward;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -9,6 +10,8 @@ import android.content.Intent;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Criteria;
@@ -18,11 +21,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -42,11 +49,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.CapabilityApi;
+import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -59,7 +77,8 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RestaurantCouponActivity extends FragmentActivity implements LocationFragment.OnFragmentInteractionListener {
+public class RestaurantCouponActivity extends FragmentActivity implements LocationFragment.OnFragmentInteractionListener,
+        GoogleApiClient.ConnectionCallbacks,  GoogleApiClient.OnConnectionFailedListener {
 
     /* Maps */
     GoogleMap map;
@@ -92,6 +111,20 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
 
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Toast.makeText(this, "Trying to connect"+zCode, Toast.LENGTH_SHORT).show();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_coupons);
@@ -99,9 +132,89 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         textview = (TextView) findViewById(R.id.headerText);
         headerTypeface= Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf");
         textview.setTypeface(headerTypeface);
+        Toast.makeText(getApplicationContext(), "TEts for notification", Toast.LENGTH_SHORT).show();
+        Log.i("test", "Toast.makeText(this, \"before calling noti\", Toast.LENGTH_SHORT)");
+
+/*
+
+        // Main Notification Object
+        NotificationCompat.Builder wearNotificaiton = new NotificationCompat.Builder(this)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setSmallIcon(R.drawable.wallet)
+                .setWhen(System.currentTimeMillis())
+                .setTicker("Wallet Icon")
+                .setContentTitle("Text 1")
+                .setContentText("Hello")
+                .setGroup("COUPONLIST");
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
+        Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.c1);
+
+        NotificationCompat.WearableExtender wearableExtender =
+                new NotificationCompat.WearableExtender()
+                        .setHintHideIcon(true)
+                        .setBackground(bm);
+
+        // Create a NotificationCompat.Builder to build a standard notification
+// then extend it with the WearableExtender
+        Notification notif = new NotificationCompat.Builder(this)
+                .setContentTitle("New mail from srikanth from main")
+                .setContentText("Hello srikanth")
+                .setSmallIcon(R.drawable.wallet)
+                .extend(wearableExtender)
+                .build();
+
+        // Create second page
+        Notification TrendPage =
+                new NotificationCompat.Builder(this)
+                        .setLargeIcon(bm)
+                        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bm))
+                        .build();
+
+        // Create third page
+        Notification ChartPage =
+                new NotificationCompat.Builder(this)
+                        .setLargeIcon(bm1)
+                        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bm1))
+                        .setContentTitle("test title 1")
+                        .build();
+
+        // Extend the notification builder with the second page
+        Notification notification = wearNotificaiton
+                .extend(new NotificationCompat.WearableExtender()
+                        .addPage(TrendPage).addPage(ChartPage))
+                .build();
+
+        // Issue the notification
+        // Get an instance of the NotificationManager service
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(getApplicationContext());
+        notificationManager =
+                NotificationManagerCompat.from(this);
+        notificationManager.notify(01, notif);
+*/
 
 
+        /**
+         * Builds a DataItem that on the wearable will be interpreted as a request to show a
+         * notification. The result will be a notification that only shows up on the wearable.
+         */
 
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+
+       /* Notification notify = new NotificationCompat.Builder(this)
+                .setContentTitle("test")
+                .setContentText("test")
+                .setSmallIcon(R.drawable.walleticon)
+                .build();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(001, notify);*/
 
         // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
@@ -377,6 +490,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         imgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent i = new Intent(RestaurantCouponActivity.this, MoneyEarnedActivity.class);
                 startActivity(i);
             }
@@ -544,6 +658,132 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
         }
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+
+        Toast.makeText(getApplicationContext(), "COnnected and calling", Toast.LENGTH_SHORT).show();
+
+
+        if(mGoogleApiClient.isConnected()){
+            Wearable.CapabilityApi.getAllCapabilities(mGoogleApiClient, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetAllCapabilitiesResult>() {
+                @Override
+                public void onResult(CapabilityApi.GetAllCapabilitiesResult getAllCapabilitiesResult) {
+                    Toast.makeText(RestaurantCouponActivity.this, "got s result:", Toast.LENGTH_SHORT).show();
+                    for (String s : getAllCapabilitiesResult.getAllCapabilities().keySet())
+                    {
+                        Toast.makeText(RestaurantCouponActivity.this, "s name:" +s, Toast.LENGTH_SHORT).show();
+                        CapabilityInfo info = getAllCapabilitiesResult.getAllCapabilities().get(s);
+
+                        Toast.makeText(RestaurantCouponActivity.this, "info nodes:" + info.getName(), Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            });
+
+            Log.i("test", "Always called!");
+            Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                @Override
+                public void onResult(NodeApi.GetConnectedNodesResult nodes) {
+                    Log.i("test","calleing :( ");
+                    Toast.makeText(RestaurantCouponActivity.this, "clling nodes:", Toast.LENGTH_SHORT).show();
+                    for (Node node : nodes.getNodes()) {
+                        Toast.makeText(RestaurantCouponActivity.this, "nodes:" +node.getDisplayName(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+/*
+        this.runOnUiThread(new Runnable(){
+
+
+            public void run() {
+                Toast.makeText(RestaurantCouponActivity.this, "Getting nodes", Toast.LENGTH_SHORT).show();
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+
+                Toast.makeText(RestaurantCouponActivity.this, "Message during run", Toast.LENGTH_SHORT).show();
+
+                Log.v("myTag", "got nodes");
+                if (nodes == null)
+                    Log.v("myTag", "null node");
+                else if (nodes.getNodes() != null)
+                    Log.v("myTag", "nodes sze:"+ nodes.getNodes().size());
+                else
+                    Log.v("myTag", "get nodes null:");
+                for (Node node : nodes.getNodes()) {
+
+                    Toast.makeText(RestaurantCouponActivity.this, "Message: Success Transfer sent to:" + node.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                    Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
+                    Asset asset = createAssetFromBitmap(bm);
+                    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/test");
+                    putDataMapRequest.getDataMap().putString(Constants.KEY_CONTENT, "Test data transfer");
+                    putDataMapRequest.getDataMap().putString(Constants.KEY_TITLE, "Success Transfer");
+                    putDataMapRequest.getDataMap().putAsset("cimage", asset);
+                    PutDataRequest request = putDataMapRequest.asPutDataRequest();
+                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+                    if (result.getStatus().isSuccess()) {
+                  Toast.makeText(RestaurantCouponActivity.this, "Message: Success Transfer sent to:" + node.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                        Log.v("myTag", "Message: Test sent to " + node.getDisplayName());
+                    }
+                    else {
+                        // Log an error
+                    Toast.makeText(RestaurantCouponActivity.this, "Error failed to send msg", Toast.LENGTH_SHORT).show();
+
+                        Log.v("myTag", "ERROR: failed to send Message");
+                    }
+                }
+            }
+        });
+*/
+       //Requires a new thread to avoid blocking the UI
+     //    SendToDataLayerThread("/message_path", "Trying to send msg"));
+
+        Toast.makeText(getApplicationContext(), "Before check connection", Toast.LENGTH_SHORT).show();
+
+        if (mGoogleApiClient.isConnected()) {
+            Toast.makeText(getApplicationContext(), "is connected", Toast.LENGTH_SHORT).show();
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
+            Asset asset = createAssetFromBitmap(bm);
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/test");
+            putDataMapRequest.getDataMap().putString(Constants.KEY_CONTENT, "Test data transfer");
+            putDataMapRequest.getDataMap().putString(Constants.KEY_TITLE, "Success Transfer");
+            putDataMapRequest.getDataMap().putAsset("cimage", asset);
+            PutDataRequest request = putDataMapRequest.asPutDataRequest();
+            Wearable.DataApi.putDataItem(mGoogleApiClient, request)
+                    .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(DataApi.DataItemResult dataItemResult) {
+                            if (!dataItemResult.getStatus().isSuccess()) {
+                                Log.e("Error tag", "buildWatchOnlyNotification(): Failed to set the data, "
+                                        + "status: " + dataItemResult.getStatus().getStatusCode());
+                                Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Failed to set the data", Toast.LENGTH_SHORT).show();
+
+                            }
+                            else
+                            {
+                                Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Success to set the data", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+            Toast.makeText(getApplicationContext(), "done calling noti", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "no API connected", Toast.LENGTH_SHORT).show();
+            Log.e("Success Tag", "buildWearableOnlyNotification(): no Google API Client connection");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
 
     public class SelectedCouponListener implements View.OnClickListener
     {
@@ -581,4 +821,55 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
     }
 
 
+    private static Asset createAssetFromBitmap(Bitmap bitmap) {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+        return Asset.createFromBytes(byteStream.toByteArray());
+    }
+
+    public class SendToDataLayerThread extends Thread {
+        String path;
+        String message;
+
+        // Constructor to send a message to the data layer
+        SendToDataLayerThread(String p, String msg) {
+            path = p;
+            message = msg;
+        }
+
+        public void run() {
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+           Toast.makeText(RestaurantCouponActivity.this, "Message during run", Toast.LENGTH_SHORT).show();
+
+            Log.v("myTag", "got nodes");
+            if (nodes == null)
+                Log.v("myTag", "null node");
+            else
+                Log.v("myTag", "nodes sze:"+ nodes.getNodes().size());
+            for (Node node : nodes.getNodes()) {
+
+             //   Toast.makeText(RestaurantCouponActivity.this, "Message: Success Transfer sent to:" + node.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
+                Asset asset = createAssetFromBitmap(bm);
+                PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/test");
+                putDataMapRequest.getDataMap().putString(Constants.KEY_CONTENT, "Test data transfer");
+                putDataMapRequest.getDataMap().putString(Constants.KEY_TITLE, "Success Transfer");
+                putDataMapRequest.getDataMap().putAsset("cimage", asset);
+                PutDataRequest request = putDataMapRequest.asPutDataRequest();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+                if (result.getStatus().isSuccess()) {
+//                    Toast.makeText(RestaurantCouponActivity.this, "Message: Success Transfer sent to:" + node.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                    Log.v("myTag", "Message: {" + message + "} sent to: " + node.getDisplayName());
+                }
+                else {
+                    // Log an error
+  //                 Toast.makeText(RestaurantCouponActivity.this, "Error failed to send msg", Toast.LENGTH_SHORT).show();
+
+                    Log.v("myTag", "ERROR: failed to send Message");
+                }
+            }
+        }
+    }
 }

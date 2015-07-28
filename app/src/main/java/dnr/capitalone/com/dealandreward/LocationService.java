@@ -1,0 +1,375 @@
+package dnr.capitalone.com.dealandreward;
+
+
+import android.app.Notification;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static android.location.LocationManager.*;
+
+/**
+ * Created by Divya on 7/27/2015.
+ */
+public class LocationService extends Service
+{
+    public static final String BROADCAST_ACTION = "Hello World";
+    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    public LocationManager locationManager;
+    public MyLocationListener listener;
+    public Location previousBestLocation = null;
+
+    Intent intent;
+    int counter = 0;
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        intent = new Intent(BROADCAST_ACTION);
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId)
+    {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        listener = new MyLocationListener();
+        locationManager.requestLocationUpdates(NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
+        locationManager.requestLocationUpdates(GPS_PROVIDER, 4000, 0, listener);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("TestData", "starting service");
+        Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        listener = new MyLocationListener();
+        locationManager.requestLocationUpdates(NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
+        locationManager.requestLocationUpdates(GPS_PROVIDER, 4000, 0, listener);
+        return START_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent)
+    {
+        return null;
+    }
+
+    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Check whether the new location fix is newer or older
+        long timeDelta = location.getTime() - currentBestLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location
+        // because the user has likely moved
+        if (isSignificantlyNewer) {
+            return true;
+            // If the new location is more than two minutes older, it must be worse
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                currentBestLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    /** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        // handler.removeCallbacks(sendUpdatesToUI);
+        super.onDestroy();
+        Log.v("STOP_SERVICE", "DONE");
+        locationManager.removeUpdates(listener);
+    }
+
+    public static Thread performOnBackgroundThread(final Runnable runnable) {
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } finally {
+
+                }
+            }
+        };
+        t.start();
+        return t;
+    }
+
+
+
+
+    public class MyLocationListener implements LocationListener
+    {
+
+        public void onLocationChanged(final Location loc)
+        {
+           // Log.i("**************************************", "Location changed");
+            if(isBetterLocation(loc, previousBestLocation)) {
+                loc.getLatitude();
+                loc.getLongitude();
+                intent.putExtra("Latitude", loc.getLatitude());
+                intent.putExtra("Longitude", loc.getLongitude());
+                intent.putExtra("Provider", loc.getProvider());
+                sendBroadcast(intent);
+
+                Toast.makeText(getApplicationContext(), "location change " , Toast.LENGTH_SHORT).show();
+                LocationAddress l;
+                l = new LocationAddress(getApplicationContext());
+
+                String zipcode = l.getZipCodeFromLocation(loc);
+                Toast.makeText(getApplicationContext(), "location change zipcode: "+ zipcode , Toast.LENGTH_SHORT).show();
+
+                // Create Inner Thread Class
+                Thread background = new Thread(new UIThread(zipcode));
+                // Start Thread
+                background.start();
+
+
+
+            }
+        }
+
+
+
+        public void onProviderDisabled(String provider)
+        {
+            Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
+        }
+
+
+        public void onProviderEnabled(String provider)
+        {
+            Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+        }
+
+
+        public void onStatusChanged(String provider, int status, Bundle extras)
+        {
+
+        }
+
+
+        public class UIThread implements Runnable{
+
+            private String zipCode = "";
+            UIThread(String zCode) {
+                zipCode = zCode;
+            }
+
+            private String urlString = "http://52.5.81.122:8080/retreive/coupon/";
+            private String jsonString = "";
+            private String SetServerString = "";
+            // After call for background.start this run method call
+            public void run() {
+                try {
+
+                    Log.i("run",  "location change check address" + zipCode );
+                    Toast.makeText(getApplicationContext(), "location change check address" + zipCode , Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPref1 = getBaseContext().getSharedPreferences(
+                            "dnrLoginPrefFiles", Context.MODE_PRIVATE);
+
+                    String email = sharedPref1.getString("username", "bkadali@gmail.com");
+
+                    SharedPreferences sharedPref = getBaseContext().getSharedPreferences(email +
+                            "walletPrefFiles", Context.MODE_PRIVATE);
+                    Map<String, ?> prefFilesMap = sharedPref.getAll();
+                    String couponIDs;
+
+
+                    if (prefFilesMap.isEmpty() != true) {
+                        Log.d("MyApp", "Inside!");
+                        couponIDs = (String) prefFilesMap.get("couponIDs");
+                        Log.d("CouponIDSet", couponIDs);
+                        Set<String> couponIDSet = new HashSet<String>(Arrays.asList(couponIDs.split(",")));
+                        int i = 0;
+                        int end = couponIDSet.size();
+                        InputStream in = null;
+                        List<String> couponDetailsList = new ArrayList<String>();
+                        for(String couponID: couponIDSet) {
+                            urlString = "http://52.5.81.122:8080/retreive/coupon/" + couponID;
+                            java.net.URL url = new URL(urlString);
+                            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                            String SetServerString = "";
+                            in = new BufferedInputStream(urlConnection.getInputStream());
+                            //Log.d("MyApp", "Input Stream is: " + convertInputStreamToString(in));
+                            // convert inputstream to string
+                            if(in != null)
+                                SetServerString = convertInputStreamToString(in);
+                            else
+                                SetServerString = "Did not work!";
+                            Log.d("BeforeReplaced", SetServerString);
+                            couponDetailsList.add(SetServerString);
+                        }
+                        jsonString = Arrays.toString(couponDetailsList.toArray());
+                        Log.d("Wallet", "reached");
+                        Log.d("JsonString", jsonString);
+                        Log.d("SetServerString", "In Wallet SetServerString is : " + SetServerString);
+                        in.close();
+                        threadMsg(jsonString);
+                    }
+                } catch (Throwable t) {
+                    // just end the background thread
+                    Log.i("Animation", "Thread  exception " + t);
+                }
+            }
+
+            private void threadMsg(String msg) {
+                if (!msg.equals(null) && !msg.equals("")) {
+                    Message msgObj = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("message", msg);
+                    msgObj.setData(b);
+                    handler.sendMessage(msgObj);
+                }
+            }
+
+            // Define the Handler that receives messages from the thread and update the progress
+            private final Handler handler = new Handler() {
+                public void handleMessage(Message msg) {
+                    String aResponse = msg.getData().getString("message");
+                    Log.d("aResponse", "In Handler aResponse is: " + aResponse);
+                    if ((null != aResponse)) {
+                        Type listType = new TypeToken<List<CouponDetails>>() {}.getType();
+                        ArrayList<CouponDetails> list = new Gson().fromJson(aResponse, listType);
+                        ArrayList<CouponDetails> testAddress = new ArrayList<CouponDetails>();
+                        String couponsDetails = "";
+                        for (int i = 0; i < list.size(); i++) {
+                            //   displayCoupon(list.get(i).getCouponInfo(), list.get(i).getMerchant(), i, list.get(i).getCouponId());
+
+                            if (list.get(i).getZipcode() != null && list.get(i).getZipcode().equals(zipCode) )
+                            {
+                                testAddress.add(list.get(i));
+                                couponsDetails+="You have a coupon for the restuarent: "+ list.get(i).getMerchant() + " at Address: "+
+                                        list.get(i).getAddress() +" " + list.get(i).getZipcode() + ", for a coupon off " + list.get(i).getCouponInfo()+ ".";
+                            }
+                        }
+
+                        if (testAddress.size() > 0)
+                        {
+                            NotificationCompat.Builder wearNotificaiton = new NotificationCompat.Builder(getApplicationContext())
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setSmallIcon(R.drawable.wallet)
+                                    .setWhen(System.currentTimeMillis())
+                                    .setTicker("Wallet Icon")
+                                    .setContentTitle("Text 1")
+                                    .setContentText("Hello")
+                                    .setGroup("COUPONLIST");
+
+
+                            NotificationCompat.WearableExtender wearableExtender =
+                                    new NotificationCompat.WearableExtender()
+                                            .setHintHideIcon(true);
+
+                            // Create a NotificationCompat.Builder to build a standard notification
+// then extend it with the WearableExtender
+                            Notification notif = new NotificationCompat.Builder(getApplicationContext())
+                                    .setContentTitle("Coupons Available in your area")
+                                    .setContentText(couponsDetails)
+                                    .setSmallIcon(R.drawable.wallet)
+                                    .extend(wearableExtender)
+                                    .build();
+
+                            // Extend the notification builder with the second page
+                        /*Notification notification = wearNotificaiton
+                                .extend(new NotificationCompat.WearableExtender().build();*/
+
+                            // Issue the notification
+                            // Get an instance of the NotificationManager service
+                            NotificationManagerCompat notificationManager =
+                                    NotificationManagerCompat.from(getApplicationContext());
+                            notificationManager =
+                                    NotificationManagerCompat.from(getApplicationContext());
+                            notificationManager.notify(01, notif);
+                        }
+                    }
+                    else {
+                        Log.e("Error", "No Response From Server in Location check");
+                    }
+                }
+            };
+        }
+
+        private String convertInputStreamToString(InputStream inputStream) throws IOException {
+            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+            String line = "";
+            String result = "";
+            while((line = bufferedReader.readLine()) != null)
+                result += line;
+
+            inputStream.close();
+            return result;
+
+        }
+
+
+    }
+}

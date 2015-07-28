@@ -661,17 +661,18 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
     @Override
     public void onConnected(Bundle bundle) {
 
-        Toast.makeText(getApplicationContext(), "COnnected and calling", Toast.LENGTH_SHORT).show();
+/*
+   //     Toast.makeText(getApplicationContext(), "COnnected and calling", Toast.LENGTH_SHORT).show();
 
 
         if(mGoogleApiClient.isConnected()){
             Wearable.CapabilityApi.getAllCapabilities(mGoogleApiClient, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetAllCapabilitiesResult>() {
                 @Override
                 public void onResult(CapabilityApi.GetAllCapabilitiesResult getAllCapabilitiesResult) {
-                    Toast.makeText(RestaurantCouponActivity.this, "got s result:", Toast.LENGTH_SHORT).show();
+     //               Toast.makeText(RestaurantCouponActivity.this, "got s result:", Toast.LENGTH_SHORT).show();
                     for (String s : getAllCapabilitiesResult.getAllCapabilities().keySet())
                     {
-                        Toast.makeText(RestaurantCouponActivity.this, "s name:" +s, Toast.LENGTH_SHORT).show();
+       //                 Toast.makeText(RestaurantCouponActivity.this, "s name:" +s, Toast.LENGTH_SHORT).show();
                         CapabilityInfo info = getAllCapabilitiesResult.getAllCapabilities().get(s);
 
                         Toast.makeText(RestaurantCouponActivity.this, "info nodes:" + info.getName(), Toast.LENGTH_SHORT).show();
@@ -692,6 +693,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                 }
             });
         }
+*/
 
 /*
         this.runOnUiThread(new Runnable(){

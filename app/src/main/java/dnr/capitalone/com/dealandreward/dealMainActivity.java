@@ -71,6 +71,7 @@ public class dealMainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_deal_main);
 
         Toast.makeText(getApplicationContext(), "calling start service" , Toast.LENGTH_SHORT).show();
+
         startService(new Intent(this, LocationService.class));
         Toast.makeText(getApplicationContext(), "done calling start service" , Toast.LENGTH_SHORT).show();
         /* TODO: CHANGE~~   Clear When Coupon is Used or Deleted */

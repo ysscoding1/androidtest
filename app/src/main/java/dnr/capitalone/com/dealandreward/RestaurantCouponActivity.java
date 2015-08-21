@@ -284,6 +284,10 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
 
                         LinearLayout ll = (LinearLayout)findViewById(R.id.mapLevel);
 
+                        SharedPreferences sharedPref = getBaseContext().getSharedPreferences(
+                                "dnrCouponAddress", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+
                         for (int i = 0; i < list.size(); i++) {
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -306,7 +310,15 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             ((TextView)repeatedCouponButtonLayout.findViewById(R.id.couponButtonFrameDescription)).setText(list.get(i).getCouponInfo());
                             repeatedCouponButtonLayout.setOnClickListener(new SelectedCouponListener(list.get(i).getCouponId()));
                             ll.addView(repeatedCouponButtonLayout, params);
+
+                            editor.putString(list.get(i).getCouponId(), list.get(i).getAddress().toString());
+                            editor.putString(list.get(i).getCouponId()+"name", list.get(i).getMerchant().toString());
+                            editor.putString(list.get(i).getCouponId()+"zip", list.get(i).getZipcode().toString());
+                            String zipValues =  sharedPref.getString(list.get(i).getCouponId(), "60173");
+                            editor.putString(list.get(i).getZipcode(), zipValues+","+list.get(i).getAddress().toString());
                         }
+
+                        editor.commit();
                         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                         // Define the criteria how to select the location provider
                         Criteria criteria = new Criteria();
@@ -742,10 +754,10 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
        //Requires a new thread to avoid blocking the UI
      //    SendToDataLayerThread("/message_path", "Trying to send msg"));
 
-        Toast.makeText(getApplicationContext(), "Before check connection", Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getApplicationContext(), "Before check connection", Toast.LENGTH_SHORT).show();
 
         if (mGoogleApiClient.isConnected()) {
-            Toast.makeText(getApplicationContext(), "is connected", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getApplicationContext(), "is connected", Toast.LENGTH_SHORT).show();
             Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.tgifcoupon);
             Asset asset = createAssetFromBitmap(bm);
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/test");
@@ -760,18 +772,18 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
                             if (!dataItemResult.getStatus().isSuccess()) {
                                 Log.e("Error tag", "buildWatchOnlyNotification(): Failed to set the data, "
                                         + "status: " + dataItemResult.getStatus().getStatusCode());
-                                Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Failed to set the data", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Failed to set the data", Toast.LENGTH_SHORT).show();
 
                             }
                             else
                             {
-                                Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Success to set the data", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(getApplicationContext(), "buildWatchOnlyNotification(): Success to set the data", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-            Toast.makeText(getApplicationContext(), "done calling noti", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "done calling noti", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "no API connected", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "no API connected", Toast.LENGTH_SHORT).show();
             Log.e("Success Tag", "buildWearableOnlyNotification(): no Google API Client connection");
         }
     }
@@ -841,7 +853,7 @@ public class RestaurantCouponActivity extends FragmentActivity implements Locati
 
         public void run() {
             NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-           Toast.makeText(RestaurantCouponActivity.this, "Message during run", Toast.LENGTH_SHORT).show();
+          // Toast.makeText(RestaurantCouponActivity.this, "Message during run", Toast.LENGTH_SHORT).show();
 
             Log.v("myTag", "got nodes");
             if (nodes == null)

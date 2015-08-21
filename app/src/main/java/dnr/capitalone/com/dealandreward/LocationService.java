@@ -46,13 +46,13 @@ import static android.location.LocationManager.*;
 public class LocationService extends Service
 {
     public static final String BROADCAST_ACTION = "Hello World";
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    private static final int TWO_MINUTES = 1000 * 30 * 1;
     public LocationManager locationManager;
     public MyLocationListener listener;
     public Location previousBestLocation = null;
     NotificationCompat.Builder wearNotificaiton = null;
-    //NotificationManagerCompat notificationManager = null;
-    NotificationManager notificationManager;
+    NotificationManagerCompat notificationManager = null;
+    //NotificationManagerCom notificationManager;
     NotificationCompat.Builder notif;
     Intent intent;
     int counter = 0;
@@ -76,9 +76,10 @@ public class LocationService extends Service
                 .setSmallIcon(R.drawable.wallet)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Wallet Icon")
-                .setContentTitle("Text 1")
+                .setContentTitle("Your Nearest Coupons")
                 .setContentText("Hello")
                 .setGroup("COUPONLIST");
+
 
         // Create a NotificationCompat.Builder to build a standard notification
 // then extend it with the WearableExtender
@@ -96,8 +97,10 @@ public class LocationService extends Service
         // Issue the notification
         // Get an instance of the NotificationManager service
 
-        notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+         notificationManager =
+                NotificationManagerCompat.from(getApplicationContext());
 
         // user defines the criteria
 
@@ -227,7 +230,7 @@ public class LocationService extends Service
                 LocationAddress l;
                 l = new LocationAddress(getApplicationContext());
 
-                final String zipcode = l.getZipCodeFromLocation(loc);
+                final String zipcode = "60173";// l.getZipCodeFromLocation(loc);
                 Toast.makeText(getApplicationContext(), "location change zipcode: "+ zipcode , Toast.LENGTH_SHORT).show();
 
                 // Define the criteria how to select the location provider
@@ -252,10 +255,37 @@ public class LocationService extends Service
 
 
                 if (prefFilesMap.isEmpty() != true) {
-                    String couponsDetails = "You have a coupon for the restuarent: TGIF at Address: 1695 East Golf Road, Schaumburg, IL 60173, for a coupon off 5.";
+                    Toast.makeText(getApplicationContext(), "pref is not null: "+ zipcode , Toast.LENGTH_SHORT).show();
 
-                    wearNotificaiton.setContentText(couponsDetails);
-                    notificationManager.notify(01, wearNotificaiton.build());
+                    SharedPreferences sharedPref2 = getBaseContext().getSharedPreferences(
+                            "dnrCouponAddress", Context.MODE_PRIVATE);
+                    boolean flag = false;
+                    if (sharedPref2.getAll().isEmpty() != true)
+                    {
+                        Toast.makeText(getApplicationContext(), "pref2 is not null: "+ zipcode , Toast.LENGTH_SHORT).show();
+                        couponIDs = (String) prefFilesMap.get("couponIDs");
+                        Toast.makeText(getApplicationContext(), "coupon ids: "+ couponIDs , Toast.LENGTH_SHORT).show();
+                        String[] ids = couponIDs.split(",");
+                        String couponsDetails = "You have a coupon for the restuarent:";
+                        for(String s : ids)
+                        {
+                            String add =  sharedPref2.getString(s, "1615 Golf Rd, Schaumurg, IL");
+                            String name = sharedPref2.getString(s+"name", "TGIF");
+                            String zip = sharedPref2.getString(s+"zip", "60173");
+                            if (zip.equals(zipcode)) {
+                                couponsDetails += name + " at ";
+                                couponsDetails += add;
+                                flag = true;
+                            }
+                        }
+
+                        if (flag) {
+                            wearNotificaiton.setContentText(couponsDetails);
+                            wearNotificaiton.setStyle(new NotificationCompat.BigTextStyle().bigText(couponsDetails));
+                            notificationManager.notify(01, wearNotificaiton.build());
+                            flag = false;
+                        }
+                    }
 
                 }
 
